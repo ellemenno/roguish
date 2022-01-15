@@ -1,0 +1,2 @@
+# rougish
+a rougue-like
