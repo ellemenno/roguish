@@ -1,0 +1,6 @@
+.dart_tool/
+.packages
+bin/*
+!bin/rougish.dart
+log.txt
+TODO.md
