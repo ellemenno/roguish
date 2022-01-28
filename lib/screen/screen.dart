@@ -1,9 +1,7 @@
-
 import 'dart:async';
 
 import 'src/pause_screen.dart';
 import 'src/test_screen.dart';
-
 
 enum ScreenEvent {
   nothing,
@@ -12,11 +10,12 @@ enum ScreenEvent {
 }
 
 abstract class Screen {
-  StreamController<ScreenEvent> _eventBroadcaster = new StreamController<ScreenEvent>.broadcast();
+  StreamController<ScreenEvent> _eventBroadcaster = StreamController<ScreenEvent>.broadcast();
 
   StreamSubscription<ScreenEvent> listen(void Function(ScreenEvent) eventHandler) {
     return _eventBroadcaster.stream.listen(eventHandler);
   }
+
   void broadcast(ScreenEvent event) {
     _eventBroadcaster.add(event);
   }
@@ -26,8 +25,12 @@ abstract class Screen {
   void onString(String string);
   void draw(StringBuffer buffer);
 
-  Screen() ;
+  Screen();
 
-  factory Screen.pause() { return PauseScreen(); }
-  factory Screen.test() { return TestScreen(); }
+  factory Screen.pause() {
+    return PauseScreen();
+  }
+  factory Screen.test() {
+    return TestScreen();
+  }
 }

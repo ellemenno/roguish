@@ -16,9 +16,10 @@ late StreamSubscription<ScreenEvent> screenListener;
 late StreamSubscription<List<int>> termListener;
 late Screen currentScreen;
 
-
-void pushScreen(Screen screen, {bool first: false}) {
-  if (!first) { screenListener.cancel(); }
+void pushScreen(Screen screen, {bool first = false}) {
+  if (!first) {
+    screenListener.cancel();
+  }
   screenStack.add(screen);
   currentScreen = screenStack.last;
   Log.info(logLabel, 'pushScreen() added ${screen.runtimeType} as new current screen');
@@ -31,12 +32,13 @@ Screen popScreen() {
   Screen screen = screenStack.removeLast();
   currentScreen = screenStack.last;
   screenListener = currentScreen.listen(onScreenEvent);
-  Log.info(logLabel, 'popScreen() removed ${screen.runtimeType}; current screen is ${currentScreen.runtimeType}');
+  Log.info(logLabel,
+      'popScreen() removed ${screen.runtimeType}; current screen is ${currentScreen.runtimeType}');
   currentScreen.draw(sb);
   return screen;
 }
 
-Iterable<String> codesToString(List<int> codes) => codes.map( (e) => '0x${e.toRadixString(16)}' );
+Iterable<String> codesToString(List<int> codes) => codes.map((e) => '0x${e.toRadixString(16)}');
 
 void showCodes(List<int> codes) {
   Log.debug(logLabel, () => 'showCodes() ' + codesToString(codes).toString());
@@ -49,14 +51,18 @@ void onResize() {
 }
 
 void onPause() {
-  if (paused) { return; }
+  if (paused) {
+    return;
+  }
   Log.info(logLabel, 'onPause() pausing..');
   paused = true;
   pushScreen(pause);
 }
 
 void onResume() {
-  if (!paused) { return; }
+  if (!paused) {
+    return;
+  }
   Log.info(logLabel, 'onResume() resuming..');
   paused = false;
   popScreen();
@@ -74,8 +80,11 @@ void onQuit() {
 
 void onEscape() {
   Log.debug(logLabel, 'onEscape()');
-  if (!paused) { onPause(); }
-  else { onControlCode(0x1b); }
+  if (!paused) {
+    onPause();
+  } else {
+    onControlCode(0x1b);
+  }
 }
 
 void onControlCode(int code) {
@@ -99,34 +108,50 @@ void onString(String string) {
 void onScreenEvent(ScreenEvent event) {
   Log.debug(logLabel, 'onScreenEvent() ${event.name}');
   switch (event) {
-    case ScreenEvent.resume: onResume(); break;
-    case ScreenEvent.quit: onQuit(); break;
-    default: term.centerMessage(sb, 'screen event: ${event}; (no action)\n', yOffset: -6);
+    case ScreenEvent.resume:
+      onResume();
+      break;
+    case ScreenEvent.quit:
+      onQuit();
+      break;
+    default:
+      term.centerMessage(sb, 'screen event: ${event}; (no action)\n', yOffset: -6);
   }
 }
 
 void onData(List<int> codes) {
   int len = codes.length;
-  if (len == 0) { return; }
+  if (len == 0) {
+    return;
+  }
 
   int first = codes.first;
   showCodes(codes);
 
   if (len == 1) {
-    if (first == 0x1b) { onEscape(); }
-    else if (first == 0x7f || first < 0x20) { onControlCode(first); }
-    else { onString(String.fromCharCode(first)); }
-  }
-  else if (first == 0x1b) { onControlSequence(codes); }
-  else { onString(utf8.decode(codes)); } // need a non-US keyboard to trigger this?
+    if (first == 0x1b) {
+      onEscape();
+    } else if (first == 0x7f || first < 0x20) {
+      onControlCode(first);
+    } else {
+      onString(String.fromCharCode(first));
+    }
+  } else if (first == 0x1b) {
+    onControlSequence(codes);
+  } else {
+    onString(utf8.decode(codes));
+  } // need a non-US keyboard to trigger this?
 }
 
 void addSignalListeners() {
-  ProcessSignal.sigint.watch().listen((signal) => onQuit()); // request process interrupt from keyboard, i.e. ctrl-c --> sigint
-  ProcessSignal.sigterm.watch().listen((signal) => onQuit()); // request process termination --> sigterm
-  ProcessSignal.sigwinch.watch().listen((signal) => onResize()); // notification of term window size change --> sigwinch
+  ProcessSignal.sigint
+      .watch()
+      .listen((signal) => onQuit()); // process interrupt from keyboard, e.g. ctrl-c --> sigint
+  ProcessSignal.sigterm.watch().listen((signal) => onQuit()); // process termination --> sigterm
+  ProcessSignal.sigwinch
+      .watch()
+      .listen((signal) => onResize()); // notification of term window size change --> sigwinch
 }
-
 
 void main(List<String> arguments) {
   Log.toFile();

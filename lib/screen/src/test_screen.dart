@@ -1,15 +1,13 @@
-
 import 'dart:math';
 
 import 'package:rougish/term/ansi.dart' as ansi;
 import 'package:rougish/term/terminal.dart' as term;
 import '../screen.dart';
 
-
 class TestScreen extends Screen {
   final StringBuffer _charSeq = StringBuffer();
   final StringBuffer _nextMsg = StringBuffer();
-  final _rnd = new Random();
+  final _rnd = Random();
 
   void testAnsi(StringBuffer sb) {
     // c16: (0=black, 1=red, 2=green, 3=yellow, 4=blue, 5=magenta, 6=cyan, 7=white)
@@ -26,7 +24,7 @@ class TestScreen extends Screen {
     term.printBuffer(sb);
   }
 
-  void blockAt(StringBuffer sb, int x, int y, {int color: 0xffffff}) {
+  void blockAt(StringBuffer sb, int x, int y, {int color = 0xffffff}) {
     ansi.xy(sb, x, y);
     ansi.cRGB(sb, '+', fg: 0, bg: color);
     ansi.reset(sb);
@@ -63,9 +61,8 @@ class TestScreen extends Screen {
     term.printBuffer(sb);
   }
 
-
-  void onControlCode(int code) { /* no-op */ }
-  void onControlSequence(List<int> codes) { /* no-op */ }
+  void onControlCode(int code) {/* no-op */}
+  void onControlSequence(List<int> codes) {/* no-op */}
 
   void onString(String string) {
     _charSeq.write(string);

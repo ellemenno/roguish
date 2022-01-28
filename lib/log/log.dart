@@ -1,6 +1,4 @@
-
 import 'dart:io';
-
 
 enum LogLevel {
   none,
@@ -67,27 +65,39 @@ class Log {
   }
 
   static void debug(String label, Object? messageGenerator) {
-    if (level.index >= LogLevel.debug.index) { _processMessage(LogLevel.debug, label, messageGenerator); }
+    if (level.index >= LogLevel.debug.index) {
+      _processMessage(LogLevel.debug, label, messageGenerator);
+    }
   }
 
   static void info(String label, Object? messageGenerator) {
-    if (level.index >= LogLevel.info.index) { _processMessage(LogLevel.info, label, messageGenerator); }
+    if (level.index >= LogLevel.info.index) {
+      _processMessage(LogLevel.info, label, messageGenerator);
+    }
   }
 
   static void warn(String label, Object? messageGenerator) {
-    if (level.index >= LogLevel.warn.index) { _processMessage(LogLevel.warn, label, messageGenerator); }
+    if (level.index >= LogLevel.warn.index) {
+      _processMessage(LogLevel.warn, label, messageGenerator);
+    }
   }
 
   static void error(String label, Object? messageGenerator) {
-    if (level.index >= LogLevel.error.index) { _processMessage(LogLevel.error, label, messageGenerator); }
+    if (level.index >= LogLevel.error.index) {
+      _processMessage(LogLevel.error, label, messageGenerator);
+    }
   }
 
   static void fatal(String label, Object? messageGenerator) {
-    if (level.index >= LogLevel.fatal.index) { _processMessage(LogLevel.fatal, label, messageGenerator); }
+    if (level.index >= LogLevel.fatal.index) {
+      _processMessage(LogLevel.fatal, label, messageGenerator);
+    }
   }
 
   static void _processMessage(LogLevel level, String label, Object? messageGenerator) {
-    if (messageGenerator is Function) { messageGenerator = messageGenerator(); }
+    if (messageGenerator is Function) {
+      messageGenerator = messageGenerator();
+    }
     printer.print(formatter.format(DateTime.now(), level, label, '${messageGenerator}'));
   }
 }
