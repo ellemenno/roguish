@@ -1,0 +1,6 @@
+# static analysis configuration
+#
+# For additional information about configuring this file, see
+# https://dart.dev/guides/language/analysis-options
+
+include: package:lints/recommended.yaml
