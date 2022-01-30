@@ -13,7 +13,7 @@ void usage() {
 
 @Task('formats code')
 void format() {
-  // DartFmt.format(existingSourceDirs);
+  // DartFmt.format(existingSourceDirs, lineLength: 100);
   //   grind 0.9 is using deprecated dartfmt tool, needs to switch to dart format
   //   https://github.com/dart-lang/dart_style/issues/986
   run('dart', arguments: ['format', '--line-length', '100', '--fix', '--output', 'write', '.']);
@@ -28,9 +28,10 @@ void analyze() {
 
 @Task('runs tests')
 void test() {
-  TestRunner().test();
-  //run('dart', arguments: ['test']);
-  //  grind-provided impl has nicer formatting
+  //TestRunner().test();
+  //  grind-provided impl doesn't support randomization
+  run('dart',
+      arguments: ['test', '--test-randomize-ordering-seed=random', '--reporter', 'expanded']);
 }
 
 @Task('deletes build artifacts')
