@@ -4,3 +4,7 @@
 # https://dart.dev/guides/language/analysis-options
 
 include: package:lints/recommended.yaml
+
+analyzer:
+  errors:
+    unnecessary_brace_in_string_interps: ignore # prefer consistency instead

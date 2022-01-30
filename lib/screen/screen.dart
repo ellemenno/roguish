@@ -10,7 +10,7 @@ enum ScreenEvent {
 }
 
 abstract class Screen {
-  StreamController<ScreenEvent> _eventBroadcaster = StreamController<ScreenEvent>.broadcast();
+  final StreamController<ScreenEvent> _eventBroadcaster = StreamController<ScreenEvent>.broadcast();
 
   StreamSubscription<ScreenEvent> listen(void Function(ScreenEvent) eventHandler) {
     return _eventBroadcaster.stream.listen(eventHandler);

@@ -47,7 +47,9 @@ void showCodes(List<int> codes) {
 
 void onResize() {
   Log.info(logLabel, 'onResize() redrawing ${screenStack.length} screens from bottom up..');
-  screenStack.forEach((screen) => screen.draw(sb)); // bottom to top
+  for (final screen in screenStack) {
+    screen.draw(sb); // bottom to top
+  }
 }
 
 void onPause() {

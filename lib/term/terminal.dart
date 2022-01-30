@@ -3,129 +3,131 @@ import 'dart:io';
 
 import 'package:rougish/term/ansi.dart' as ansi;
 
-const HT = 0x09; // horizontal tab
-const LF = 0x0a; // line feed / Enter
-const ESC = 0x1b; // escape
-const BS = 0x7f; // backspace
-const PRINTABLE_LO = 0x20; // space
-const PRINTABLE_HI = 0x7e; // tilde
+const ht = 0x09; // horizontal tab
+const lf = 0x0a; // line feed / Enter
+const esc = 0x1b; // escape
+const bs = 0x7f; // backspace
+const printableLo = 0x20; // space
+const printableHi = 0x7e; // tilde
 
 enum SeqKey {
-  NONE,
-  ARROW_UP,
-  ARROW_DOWN,
-  ARROW_RIGHT,
-  ARROW_LEFT,
-  END,
-  HOME,
-  INSERT,
-  DELETE,
-  PAGE_UP,
-  PAGE_DOWN,
-  F1,
-  F2,
-  F3,
-  F4,
-  F5,
-  F6,
-  F7,
-  F8,
-  F9,
-  F10,
-  F11,
-  F12,
+  none,
+  arrowUp,
+  arrowDown,
+  arrowRight,
+  arrowLeft,
+  end,
+  home,
+  insert,
+  delete,
+  pageUp,
+  pageDown,
+  f1,
+  f2,
+  f3,
+  f4,
+  f5,
+  f6,
+  f7,
+  f8,
+  f9,
+  f10,
+  f11,
+  f12,
 }
 
 // make these re-assignable to support test mocks and other options
+//  curently, analyzer incorrectly flags:
+//  https://github.com/dart-lang/linter/pull/3118
 var print = (String msg) => stderr.write(msg);
 var printBuffer = (StringBuffer sb) => stderr.write(sb.toString());
 
 SeqKey seqKeyFromCodes(List<int> codes) {
   int n = codes.length;
   if (n < 3) {
-    return SeqKey.NONE;
+    return SeqKey.none;
   }
-  if (codes.first != ESC) {
-    return SeqKey.NONE;
+  if (codes.first != esc) {
+    return SeqKey.none;
   }
 
   if (codes[1] == 0x5b) {
     switch (codes[2]) {
       case 0x41:
-        return SeqKey.ARROW_UP; //    [ 0x1b, 0x5b, 0x41 ] - \e[A Up Arrow
+        return SeqKey.arrowUp; //    [ 0x1b, 0x5b, 0x41 ] - \e[A Up Arrow
       case 0x42:
-        return SeqKey.ARROW_DOWN; //  [ 0x1b, 0x5b, 0x42 ] - \e[B Down Arrow
+        return SeqKey.arrowDown; //  [ 0x1b, 0x5b, 0x42 ] - \e[B Down Arrow
       case 0x43:
-        return SeqKey.ARROW_RIGHT; // [ 0x1b, 0x5b, 0x43 ] - \e[C Right Arrow
+        return SeqKey.arrowRight; // [ 0x1b, 0x5b, 0x43 ] - \e[C Right Arrow
       case 0x44:
-        return SeqKey.ARROW_LEFT; //  [ 0x1b, 0x5b, 0x44 ] - \e[D Left Arrow
+        return SeqKey.arrowLeft; //  [ 0x1b, 0x5b, 0x44 ] - \e[D Left Arrow
       case 0x46:
-        return SeqKey.END; //         [ 0x1b, 0x5b, 0x46 ] - \e[F End
+        return SeqKey.end; //         [ 0x1b, 0x5b, 0x46 ] - \e[F End
       case 0x48:
-        return SeqKey.HOME; //        [ 0x1b, 0x5b, 0x48 ] - \e[H Home
+        return SeqKey.home; //        [ 0x1b, 0x5b, 0x48 ] - \e[H Home
       case 0x31:
         if (n == 5 && codes.last == 0x7e) {
           switch (codes[3]) {
             case 0x35:
-              return SeqKey.F5; // [ 0x1b, 0x5b, 0x31, 0x35, 0x7e ] - \e[15~ F5
+              return SeqKey.f5; // [ 0x1b, 0x5b, 0x31, 0x35, 0x7e ] - \e[15~ F5
             case 0x37:
-              return SeqKey.F6; // [ 0x1b, 0x5b, 0x31, 0x37, 0x7e ] - \e[17~ F6
+              return SeqKey.f6; // [ 0x1b, 0x5b, 0x31, 0x37, 0x7e ] - \e[17~ F6
             case 0x38:
-              return SeqKey.F7; // [ 0x1b, 0x5b, 0x31, 0x38, 0x7e ] - \e[18~ F7
+              return SeqKey.f7; // [ 0x1b, 0x5b, 0x31, 0x38, 0x7e ] - \e[18~ F7
             case 0x39:
-              return SeqKey.F8; // [ 0x1b, 0x5b, 0x31, 0x39, 0x7e ] - \e[19~ F8
+              return SeqKey.f8; // [ 0x1b, 0x5b, 0x31, 0x39, 0x7e ] - \e[19~ F8
           }
         }
         break;
       case 0x32:
         if (codes.last == 0x7e) {
           if (n == 4) {
-            return SeqKey.INSERT; //  [ 0x1b, 0x5b, 0x32, 0x7e ] - \e[2~ Insert
+            return SeqKey.insert; //  [ 0x1b, 0x5b, 0x32, 0x7e ] - \e[2~ Insert
           }
           if (n == 5) {
             switch (codes[3]) {
               case 0x30:
-                return SeqKey.F9; //  [ 0x1b, 0x5b, 0x32, 0x30, 0x7e ] - \e[20~ F9
+                return SeqKey.f9; //  [ 0x1b, 0x5b, 0x32, 0x30, 0x7e ] - \e[20~ F9
               case 0x31:
-                return SeqKey.F10; // [ 0x1b, 0x5b, 0x32, 0x31, 0x7e ] - \e[21~ F10
+                return SeqKey.f10; // [ 0x1b, 0x5b, 0x32, 0x31, 0x7e ] - \e[21~ F10
               //case 0x??:
-                //return SeqKey.F11; // [ 0x1b, 0x5b, 0x32, 0x??, 0x7e ] - \e[2?~ F11
+              //return SeqKey.f11; // [ 0x1b, 0x5b, 0x32, 0x??, 0x7e ] - \e[2?~ F11
               case 0x34:
-                return SeqKey.F12; // [ 0x1b, 0x5b, 0x32, 0x34, 0x7e ] - \e[24~ F12
+                return SeqKey.f12; // [ 0x1b, 0x5b, 0x32, 0x34, 0x7e ] - \e[24~ F12
             }
           }
         }
         break;
       case 0x33:
         if (n == 4 && codes.last == 0x7e) {
-          return SeqKey.DELETE; //    [ 0x1b, 0x5b, 0x33, 0x7e ] - \e[3~ Delete
+          return SeqKey.delete; //    [ 0x1b, 0x5b, 0x33, 0x7e ] - \e[3~ Delete
         }
         break;
       case 0x35:
         if (n == 4 && codes.last == 0x7e) {
-          return SeqKey.PAGE_UP; //   [ 0x1b, 0x5b, 0x35, 0x7e ] - \e[5~ PgUp
+          return SeqKey.pageUp; //   [ 0x1b, 0x5b, 0x35, 0x7e ] - \e[5~ PgUp
         }
         break;
       case 0x36:
         if (n == 4 && codes.last == 0x7e) {
-          return SeqKey.PAGE_DOWN; // [ 0x1b, 0x5b, 0x36, 0x7e ] - \e[6~ PgDn
+          return SeqKey.pageDown; // [ 0x1b, 0x5b, 0x36, 0x7e ] - \e[6~ PgDn
         }
         break;
     }
   } else if (codes[1] == 0x4f) {
     switch (codes[2]) {
       case 0x50:
-        return SeqKey.F1; // [ 0x1b, 0x4f, 0x50 ] - \eOP F1
+        return SeqKey.f1; // [ 0x1b, 0x4f, 0x50 ] - \eOP F1
       case 0x51:
-        return SeqKey.F2; // [ 0x1b, 0x4f, 0x51 ] - \eOQ F2
+        return SeqKey.f2; // [ 0x1b, 0x4f, 0x51 ] - \eOQ F2
       case 0x52:
-        return SeqKey.F3; // [ 0x1b, 0x4f, 0x52 ] - \eOR F3
+        return SeqKey.f3; // [ 0x1b, 0x4f, 0x52 ] - \eOR F3
       case 0x53:
-        return SeqKey.F4; // [ 0x1b, 0x4f, 0x53 ] - \eOS F4
+        return SeqKey.f4; // [ 0x1b, 0x4f, 0x53 ] - \eOS F4
     }
   }
 
-  return SeqKey.NONE;
+  return SeqKey.none;
 }
 
 List<int> size() {
@@ -140,11 +142,11 @@ StreamSubscription<List<int>> listen(void Function(List<int>) dataHandler) {
 }
 
 void hideCursor() {
-  print(ansi.HIDE);
+  print(ansi.hide);
 }
 
 void showCursor() {
-  print(ansi.SHOW);
+  print(ansi.show);
 }
 
 void clear(StringBuffer sb) {

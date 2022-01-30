@@ -16,6 +16,7 @@ abstract class Printer {
 class FilePrinter extends Printer {
   final File _logFile;
 
+  @override
   void print(String message) {
     _logFile.writeAsStringSync("${message}\n", mode: FileMode.append);
   }
@@ -26,6 +27,7 @@ class FilePrinter extends Printer {
 }
 
 class StderrPrinter extends Printer {
+  @override
   void print(String message) {
     stderr.write("${message}\n");
   }

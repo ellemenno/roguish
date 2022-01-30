@@ -9,7 +9,7 @@ class TestScreen extends Screen {
   final StringBuffer _nextMsg = StringBuffer();
   final _rnd = Random();
 
-  void testAnsi(StringBuffer sb) {
+  void _testAnsi(StringBuffer sb) {
     // c16: (0=black, 1=red, 2=green, 3=yellow, 4=blue, 5=magenta, 6=cyan, 7=white)
     sb.clear();
     ansi.xy(sb, 1, 3);
@@ -24,46 +24,50 @@ class TestScreen extends Screen {
     term.printBuffer(sb);
   }
 
-  void blockAt(StringBuffer sb, int x, int y, {int color = 0xffffff}) {
+  void _blockAt(StringBuffer sb, int x, int y, {int color = 0xffffff}) {
     ansi.xy(sb, x, y);
     ansi.cRGB(sb, '+', fg: 0, bg: color);
     ansi.reset(sb);
   }
 
-  void randoBlocks(StringBuffer sb, {n = 5}) {
+  void _randoBlocks(StringBuffer sb, {n = 5}) {
     List<int> dim = term.size();
     int x, y;
     sb.clear();
-    Iterable.generate(n).forEach((i) {
+    for (var i = 0; i < n; i++) {
       x = _rnd.nextInt(dim[0]) + 1;
       y = _rnd.nextInt(dim[1]) + 1;
-      blockAt(sb, x, y, color: 0x004585);
-    });
+      _blockAt(sb, x, y, color: 0x004585);
+    }
     term.printBuffer(sb);
   }
 
-  void announceSize(StringBuffer sb) {
+  void _announceSize(StringBuffer sb) {
     List<int> dim = term.size();
     term.centerMessage(sb, 'terminal is ${dim[0]} columns x ${dim[1]} lines', yOffset: -2);
   }
 
-  void stateMessage(StringBuffer sb) {
+  void _stateMessage(StringBuffer sb) {
     term.centerMessage(sb, '${_nextMsg}', yOffset: -1);
   }
 
-  void paintCorners(StringBuffer sb) {
+  void _paintCorners(StringBuffer sb) {
     List<int> dim = term.size();
     sb.clear();
-    blockAt(sb, 1, 1);
-    blockAt(sb, dim[0], 1);
-    blockAt(sb, dim[0], dim[1]);
-    blockAt(sb, 1, dim[1]);
+    _blockAt(sb, 1, 1);
+    _blockAt(sb, dim[0], 1);
+    _blockAt(sb, dim[0], dim[1]);
+    _blockAt(sb, 1, dim[1]);
     term.printBuffer(sb);
   }
 
+  @override
   void onControlCode(int code) {/* no-op */}
+
+  @override
   void onControlSequence(List<int> codes) {/* no-op */}
 
+  @override
   void onString(String string) {
     _charSeq.write(string);
     if (_charSeq.length > 3) {
@@ -73,13 +77,14 @@ class TestScreen extends Screen {
     }
   }
 
-  void draw(StringBuffer sb) {
-    term.clear(sb);
+  @override
+  void draw(StringBuffer buffer) {
+    term.clear(buffer);
 
-    randoBlocks(sb, n: 35);
-    testAnsi(sb);
-    announceSize(sb);
-    stateMessage(sb);
-    paintCorners(sb);
+    _randoBlocks(buffer, n: 35);
+    _testAnsi(buffer);
+    _announceSize(buffer);
+    _stateMessage(buffer);
+    _paintCorners(buffer);
   }
 }

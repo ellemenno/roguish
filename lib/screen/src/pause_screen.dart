@@ -23,7 +23,7 @@ class PauseScreen extends Screen {
   }
 
   String _hilightSelected(String label, int item) {
-    return (item == _curOption) ? '${ansi.FLIP}${label}${ansi.FLOP}' : label;
+    return (item == _curOption) ? '${ansi.flip}${label}${ansi.flop}' : label;
   }
 
   void _dialog(StringBuffer sb) {
@@ -42,15 +42,17 @@ class PauseScreen extends Screen {
     term.printBuffer(sb);
   }
 
+  @override
   void onString(String string) {/* no-op */}
 
+  @override
   void onControlCode(int code) {
     ScreenEvent todo = ScreenEvent.nothing;
     switch (code) {
-      case term.ESC:
+      case term.esc:
         todo = options[0];
         break;
-      case term.LF:
+      case term.lf:
         todo = options[_curOption];
         break;
       default:
@@ -60,13 +62,14 @@ class PauseScreen extends Screen {
     broadcast(todo);
   }
 
+  @override
   void onControlSequence(List<int> codes) {
     var seqKey = term.seqKeyFromCodes(codes);
     switch (seqKey) {
-      case term.SeqKey.ARROW_UP:
+      case term.SeqKey.arrowUp:
         _curOption = _wrap(_curOption, -1, numOptions);
         break;
-      case term.SeqKey.ARROW_DOWN:
+      case term.SeqKey.arrowDown:
         _curOption = _wrap(_curOption, 1, numOptions);
         break;
       default:
@@ -75,7 +78,8 @@ class PauseScreen extends Screen {
     term.centerMessage(StringBuffer(), 'seqKey: ${seqKey}  curOption: ${_curOption}', yOffset: 6);
   }
 
-  void draw(StringBuffer sb) {
-    _dialog(sb);
+  @override
+  void draw(StringBuffer buffer) {
+    _dialog(buffer);
   }
 }
