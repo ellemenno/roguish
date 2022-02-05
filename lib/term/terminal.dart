@@ -1,15 +1,30 @@
+/// utilities for reading from and printing to the terminal.
+library terminal;
+
 import 'dart:async';
 import 'dart:io';
 
 import 'package:rougish/term/ansi.dart' as ansi;
 
-const ht = 0x09; // horizontal tab
-const lf = 0x0a; // line feed / Enter
-const esc = 0x1b; // escape
-const bs = 0x7f; // backspace
-const printableLo = 0x20; // space
-const printableHi = 0x7e; // tilde
+/// horizontal tab
+const ht = 0x09;
 
+/// line feed / Enter
+const lf = 0x0a;
+
+/// escape
+const esc = 0x1b;
+
+/// backspace
+const bs = 0x7f;
+
+/// space
+const printableLo = 0x20;
+
+/// tilde
+const printableHi = 0x7e;
+
+/// keycode sequences that can be reported by the terminal
 enum SeqKey {
   none,
   arrowUp,
@@ -42,6 +57,7 @@ enum SeqKey {
 var print = (String msg) => stderr.write(msg);
 var printBuffer = (StringBuffer sb) => stderr.write(sb.toString());
 
+/// Match a given code sequence to a [SeqKey] enumeration, including [SeqKey.none] if no match.
 SeqKey seqKeyFromCodes(List<int> codes) {
   int n = codes.length;
   if (n < 3) {
@@ -130,10 +146,12 @@ SeqKey seqKeyFromCodes(List<int> codes) {
   return SeqKey.none;
 }
 
+/// Retrieve terminal width (columns), and height (rows) as a two-element list.
 List<int> size() {
   return [stderr.terminalColumns, stderr.terminalLines];
 }
 
+/// Subscribe a listener function for key sequences emitted from the terminal.
 StreamSubscription<List<int>> listen(void Function(List<int>) dataHandler) {
   stdin
     ..echoMode = false // for windows sake, echoMode must be disabled first
@@ -141,14 +159,20 @@ StreamSubscription<List<int>> listen(void Function(List<int>) dataHandler) {
   return stdin.listen(dataHandler);
 }
 
+/// Emit the ANSI code to hide the cursor.
 void hideCursor() {
   print(ansi.hide);
 }
 
+/// Emit the ANSI code to show the cursor.
 void showCursor() {
   print(ansi.show);
 }
 
+/// Clear the screen and reset the cursor.
+///
+/// The provided stringbuffer is cleared and filled with ANSI codes to reset styles,
+/// clear the screen, and position the cursor in the top left corner.
 void clear(StringBuffer sb) {
   sb.clear();
   ansi.reset(sb);
@@ -157,6 +181,13 @@ void clear(StringBuffer sb) {
   printBuffer(sb);
 }
 
+/// Print the provided message in the middle of the screen.
+///
+/// The provided stringbuffer is cleared and used to assemble the string to print.
+/// [xOffset] adjusts the horizontal position of the message.
+/// [yOffset] adjusts the vertical position of the message.
+/// [msgOffset] adjusts the calculated length of the message before centering.
+/// The entire row is cleared before the message is printed.
 void centerMessage(StringBuffer sb, String msg,
     {int xOffset = 0, int yOffset = 0, int msgOffset = 0}) {
   List<int> dim = size();

@@ -2,5 +2,6 @@
 .packages
 bin/*
 !bin/rougish.dart
+doc
 log.txt
 TODO.md

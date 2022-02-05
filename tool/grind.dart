@@ -49,8 +49,15 @@ void compile() {
   run('dart', arguments: ['compile', 'exe', '--output', outPath, inPath]);
 }
 
+@Task('generates api docs')
+void document() {
+  //Analyzer.analyze(existingSourceDirs, fatalWarnings: true);
+  //  regular dart command has better defaults and output formatting
+  run('dartdoc', arguments: ['--validate-links']);
+}
+
 @Task('prepares a release candidate')
-@Depends(format, analyze, test, compile)
+@Depends(format, analyze, test, compile, document)
 void build() {
   log('did all the things!');
 }

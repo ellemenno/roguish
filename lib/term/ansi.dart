@@ -1,12 +1,48 @@
-const csi = '\x1b['; // Control Sequence Introducer
-const plain = '${csi}0m'; // reset text styles to defaults
-const flip = '${csi}7m'; // swap foreground and background
-const flop = '${csi}27m'; // restore foreground and background
-const clear = '${csi}2J'; // clear whole screen (see cls method for other options)
-const hide = '${csi}?25l'; // hide cursor
-const show = '${csi}?25h'; // show cursor
-const none = -1; // represents no color
+/// helper functions for ansi codes.
+library ansi;
 
+/// Control Sequence Introducer
+const csi = '\x1b[';
+
+/// Resets text styles to defaults
+const plain = '${csi}0m';
+
+/// Swaps foreground and background
+const flip = '${csi}7m';
+
+/// Restores foreground and background
+const flop = '${csi}27m';
+
+/// Clears whole screen (see [cls] for more options)
+const clear = '${csi}2J';
+
+/// Hides cursor
+const hide = '${csi}?25l';
+
+/// Shows cursor
+const show = '${csi}?25h';
+
+/// Represents no color (not an ANSI code)
+const none = -1;
+
+/// Decorates [msg] with optional foreground and background colors, and prints it to [sb].
+///
+/// [c16] supports 8 hues at two intensity levels: dim (default), or bright
+/// (set [fb] `true` for foreground bright, [bb] for background bright)
+///
+/// the ansi color codes for [fg] or [bg] are:
+/// - `0` black
+/// - `1` red
+/// - `2` green
+/// - `3` yellow
+/// - `4` blue
+/// - `5` magenta
+/// - `6` cyan
+/// - `7` white
+///
+/// `-1` is interpreted as 'no color', meaning that ansi code is omitted
+///
+/// note that a terminal color scheme may remap the ansi colors to custom values
 void c16(StringBuffer sb, String msg,
     {int fg = 7, int bg = none, bool fb = false, bool bb = false}) {
   // 16 color palette
@@ -23,6 +59,11 @@ void c16(StringBuffer sb, String msg,
   sb.write(plain);
 }
 
+/// Decorates [msg] with optional foreground and background colors, and prints it to [sb].
+///
+/// [cRGB] supports 16.7M colors from 8-bit RGB hex strings (commonly used for CSS web colors).
+///
+/// `-1` is interpreted as 'no color', meaning that ansi code is omitted
 void cRGB(StringBuffer sb, String msg, {int fg = 0x999999, int bg = none}) {
   // 16.7M color palette
   // R,G,B: [0..255]
@@ -38,25 +79,40 @@ void cRGB(StringBuffer sb, String msg, {int fg = 0x999999, int bg = none}) {
   sb.write(plain);
 }
 
+/// Prints an ansi code into [sb] for font style reset (i.e. [plain]).
 void reset(StringBuffer sb) {
   // reset text styles
   // \e[0m
   sb.write(plain);
 }
 
+/// Prints an ansi code into [sb] to position the terminal cursor at row [x], column [y].
+///
+/// [x] and [y] are 1-based, up to `dart:io.Stdout.terminalColumns` and `dart:io.Stdout.terminalLines`.
 void xy(StringBuffer sb, int x, int y) {
   // position cursor (VT goes line first, then column)
-  // x and y are 1-based, up to terminalColumns and terminalLines, inclusive
   // \e[y;xH
   sb.write('${csi}${y};${x}H');
 }
 
+/// Prints an ansi code into [sb] to clear some or all of the terminal screen.
+///
+/// The portion of the screen to be cleared is controlled by [n]:
+/// - `0` from cursor to start (0,0)
+/// - `1` from cursor to end (terminalColumns, terminalLines)
+/// - `2` entire screen
 void cls(StringBuffer sb, {int n = 2}) {
   // clear screen
   // \e[nJ, n=0 cursor to start, n=1 cursor to end, n=2 all
   sb.write('${csi}${n}J');
 }
 
+/// Prints an ansi code into [sb] to clear some or all of the current line.
+///
+/// The portion of the line to be cleared is controlled by [n]:
+/// - `0` from cursor to start of line
+/// - `1` from cursor to end of line
+/// - `2` entire line
 void cll(StringBuffer sb, {int n = 2}) {
   // clear line
   // \e[nK, n=0 cursor to start, n=1 cursor to end, n=2 all
