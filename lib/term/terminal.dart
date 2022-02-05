@@ -136,8 +136,8 @@ List<int> size() {
 
 StreamSubscription<List<int>> listen(void Function(List<int>) dataHandler) {
   stdin
-    ..lineMode = false
-    ..echoMode = false;
+    ..echoMode = false // for windows sake, echoMode must be disabled first
+    ..lineMode = false; // see https://github.com/dart-lang/sdk/issues/28599#issuecomment-615940833
   return stdin.listen(dataHandler);
 }
 
