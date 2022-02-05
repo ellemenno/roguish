@@ -121,6 +121,10 @@ void onScreenEvent(ScreenEvent event) {
   }
 }
 
+void onError(Object error) {
+  Log.error(logLabel, 'error from terminal: ${error.runtimeType} - ${error}');
+}
+
 void onData(List<int> codes) {
   int len = codes.length;
   if (len == 0) {
@@ -146,13 +150,23 @@ void onData(List<int> codes) {
 }
 
 void addSignalListeners() {
-  ProcessSignal.sigint
-      .watch()
-      .listen((signal) => onQuit()); // process interrupt from keyboard, e.g. ctrl-c --> sigint
-  ProcessSignal.sigterm.watch().listen((signal) => onQuit()); // process termination --> sigterm
-  ProcessSignal.sigwinch
-      .watch()
-      .listen((signal) => onResize()); // notification of term window size change --> sigwinch
+  try {
+    ProcessSignal.sigint
+        .watch()
+        .listen((signal) => onQuit()); // process interrupt from keyboard, e.g. ctrl-c --> sigint
+
+    // the following are not supported on Windows, but the exceptions they raise
+    // are caught here and in the guarded zone in main
+    ProcessSignal.sigterm
+        .watch()
+        .listen((signal) => onQuit()); // process termination --> sigterm
+    ProcessSignal.sigwinch
+        .watch()
+        .listen((signal) => onResize()); // notification of term window size change --> sigwinch
+  }
+  on SignalException catch (e) {
+    Log.warn(logLabel, e.message);
+  }
 }
 
 void main(List<String> arguments) {
@@ -162,8 +176,14 @@ void main(List<String> arguments) {
 
   term.clear(sb);
   term.hideCursor();
-  termListener = term.listen(onData);
-  addSignalListeners();
+
+  runZonedGuarded(() {
+    termListener = term.listen(onData, onError);
+    addSignalListeners();
+  }, (e, s) {
+    Log.warn(logLabel, 'listener zone exception: ${e}');
+  });
+
   pushScreen(test, first: true);
 
   term.centerMessage(sb, 'now listening (ESC to exit)\n', yOffset: -1);
