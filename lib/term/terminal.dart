@@ -152,7 +152,8 @@ List<int> size() {
 }
 
 /// Subscribe a listener function for key sequences emitted from the terminal.
-StreamSubscription<List<int>> listen(void Function(List<int>) dataHandler, void Function(Object error) errorHandler) {
+StreamSubscription<List<int>> listen(
+    void Function(List<int>) dataHandler, void Function(Object error) errorHandler) {
   stdin
     ..echoMode = false // for windows sake, echoMode must be disabled first
     ..lineMode = false; // see https://github.com/dart-lang/sdk/issues/28599#issuecomment-615940833

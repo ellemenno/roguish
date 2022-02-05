@@ -157,14 +157,11 @@ void addSignalListeners() {
 
     // the following are not supported on Windows, but the exceptions they raise
     // are caught here and in the guarded zone in main
-    ProcessSignal.sigterm
-        .watch()
-        .listen((signal) => onQuit()); // process termination --> sigterm
+    ProcessSignal.sigterm.watch().listen((signal) => onQuit()); // process termination --> sigterm
     ProcessSignal.sigwinch
         .watch()
         .listen((signal) => onResize()); // notification of term window size change --> sigwinch
-  }
-  on SignalException catch (e) {
+  } on SignalException catch (e) {
     Log.warn(logLabel, e.message);
   }
 }
