@@ -53,7 +53,7 @@ void compile() {
 void document() {
   //Analyzer.analyze(existingSourceDirs, fatalWarnings: true);
   //  regular dart command has better defaults and output formatting
-  run('dartdoc', arguments: ['--validate-links']);
+  run('dart', arguments: ['doc', '--validate-links', '.']);
 }
 
 @Task('prepares a release candidate')
