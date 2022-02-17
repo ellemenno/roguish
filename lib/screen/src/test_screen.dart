@@ -62,14 +62,12 @@ class TestScreen extends Screen {
   }
 
   @override
-  void onControlCode(int code) {/* no-op */}
+  void onKeySequence(List<int> seq, String hash) {
+    if (!term.isPrintable(seq)) {
+      return;
+    }
 
-  @override
-  void onControlSequence(List<int> codes) {/* no-op */}
-
-  @override
-  void onString(String string) {
-    _charSeq.write(string);
+    _charSeq.write(String.fromCharCode(seq[0]));
     if (_charSeq.length > 3) {
       _nextMsg.clear();
       _nextMsg.write(_charSeq);

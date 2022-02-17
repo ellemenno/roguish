@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
+import 'package:rougish/config/config.dart' as config;
 import 'package:rougish/log/log.dart';
 import 'package:rougish/term/terminal.dart' as term;
 import 'package:rougish/screen/screen.dart';
@@ -9,12 +9,13 @@ import 'package:rougish/screen/screen.dart';
 const logLabel = 'rougish';
 final List<Screen> screenStack = [];
 final StringBuffer sb = StringBuffer();
-Screen pause = Screen.pause();
-Screen test = Screen.test();
-bool paused = false;
-late StreamSubscription<ScreenEvent> screenListener;
-late StreamSubscription<List<int>> termListener;
+final Screen pause = Screen.pause();
+final Screen test = Screen.test();
+late final StreamSubscription<List<int>> termListener;
+late Map<String, String> conf;
 late Screen currentScreen;
+late StreamSubscription<ScreenEvent> screenListener;
+bool paused = false;
 
 void pushScreen(Screen screen, {bool first = false}) {
   if (!first) {
@@ -38,11 +39,8 @@ Screen popScreen() {
   return screen;
 }
 
-Iterable<String> codesToString(List<int> codes) => codes.map((e) => '0x${e.toRadixString(16)}');
-
 void showCodes(List<int> codes) {
-  Log.debug(logLabel, () => 'showCodes() ' + codesToString(codes).toString());
-  term.centerMessage(sb, '${codesToString(codes)}\n', yOffset: -7);
+  term.centerMessage(sb, '${term.codesToString(codes)}\n', yOffset: -7);
 }
 
 void onResize() {
@@ -80,30 +78,9 @@ void onQuit() {
   exit(0);
 }
 
-void onEscape() {
-  Log.debug(logLabel, 'onEscape()');
-  if (!paused) {
-    onPause();
-  } else {
-    onControlCode(0x1b);
-  }
-}
-
-void onControlCode(int code) {
-  Log.debug(logLabel, () => 'onControlCode() ' + codesToString([code]).toString());
-  currentScreen.onControlCode(code);
-  currentScreen.draw(sb);
-}
-
-void onControlSequence(List<int> seq) {
-  Log.debug(logLabel, () => 'onControlSequence() ' + codesToString(seq).toString());
-  currentScreen.onControlSequence(seq);
-  currentScreen.draw(sb);
-}
-
-void onString(String string) {
-  Log.debug(logLabel, 'onString() \'${string}\'');
-  currentScreen.onString(string);
+void onKeySequence(List<int> seq, String hash) {
+  Log.debug(logLabel, 'onKeySequence() ${hash}');
+  currentScreen.onKeySequence(seq, hash);
   currentScreen.draw(sb);
 }
 
@@ -128,25 +105,19 @@ void onError(Object error) {
 void onData(List<int> codes) {
   int len = codes.length;
   if (len == 0) {
+    Log.debug(logLabel, 'zero-length code sequence');
     return;
   }
 
-  int first = codes.first;
   showCodes(codes);
 
-  if (len == 1) {
-    if (first == 0x1b) {
-      onEscape();
-    } else if (first == 0x7f || first < 0x20) {
-      onControlCode(first);
-    } else {
-      onString(String.fromCharCode(first));
-    }
-  } else if (first == 0x1b) {
-    onControlSequence(codes);
+  String codeHash = config.codeHash(codes);
+
+  if (!paused && config.isPause(codeHash)) {
+    onPause();
   } else {
-    onString(utf8.decode(codes));
-  } // need a non-US keyboard to trigger this?
+    onKeySequence(codes, codeHash);
+  }
 }
 
 void addSignalListeners() {
@@ -167,9 +138,14 @@ void addSignalListeners() {
 }
 
 void main(List<String> arguments) {
+  conf = config.fromFile('bin/rougish.conf');
+
   Log.toFile();
-  Log.level = LogLevel.info;
-  Log.info(logLabel, 'app startup. logging initialized. args = ${arguments}');
+  Log.level = config.logLevel(conf);
+  Log.info(logLabel, 'app startup. logging initialized at ${Log.level}. args = ${arguments}');
+  Log.debug(logLabel, 'conf = ${conf}');
+
+  config.setKeys(conf);
 
   term.clear(sb);
   term.hideCursor();
@@ -183,6 +159,6 @@ void main(List<String> arguments) {
 
   pushScreen(test, first: true);
 
-  term.centerMessage(sb, 'now listening (ESC to exit)\n', yOffset: -1);
+  term.centerMessage(sb, 'now listening. ${conf['key-pause']} for menu.\n', yOffset: -1);
   Log.info(logLabel, 'test screen added. listening for user input on stdin.');
 }

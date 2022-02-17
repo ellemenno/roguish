@@ -20,9 +20,7 @@ abstract class Screen {
     _eventBroadcaster.add(event);
   }
 
-  void onControlCode(int code);
-  void onControlSequence(List<int> codes);
-  void onString(String string);
+  void onKeySequence(List<int> seq, String hash);
   void draw(StringBuffer buffer);
 
   Screen();

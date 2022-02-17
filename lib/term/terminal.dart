@@ -15,6 +15,9 @@ const ht = 0x09;
 /// line feed / Enter
 const lf = 0x0a;
 
+/// carriage return / Enter
+const cr = 0x0d;
+
 /// escape
 const esc = 0x1b;
 
@@ -59,6 +62,39 @@ enum SeqKey {
 //  https://github.com/dart-lang/linter/pull/3118
 var print = (String msg) => stderr.write(msg);
 var printBuffer = (StringBuffer sb) => stderr.write(sb.toString());
+
+/// Determine whether a given sequence of codes represents a printable character.
+/// This implementation only passes single code sequences for printable ASCII characters
+bool isPrintable(List<int> seq) {
+  if (seq.length != 1) {
+    return false;
+  }
+  if (seq[0] < printableLo) {
+    return false;
+  }
+  if (seq[0] > printableHi) {
+    return false;
+  }
+  return true;
+}
+
+/// Determine whether a given sequence of codes represents the Enter / Return key.
+bool isEnter(List<int> seq) {
+  if (seq.length != 1) {
+    return false;
+  }
+  if (seq[0] == lf) {
+    return true;
+  }
+  if (seq[0] == cr) {
+    return true;
+  }
+  return false;
+}
+
+/// Create an iterable list of hex code strings from given key codes
+Iterable<String> codesToString(List<int> codes, {prefix = '0x'}) =>
+    codes.map((e) => '${prefix}${e.toRadixString(16).padLeft(2, '0')}');
 
 /// Match a given code sequence to a [SeqKey] enumeration, including [SeqKey.none] if no match.
 SeqKey seqKeyFromCodes(List<int> codes) {
@@ -109,8 +145,8 @@ SeqKey seqKeyFromCodes(List<int> codes) {
                 return SeqKey.f9; //  [ 0x1b, 0x5b, 0x32, 0x30, 0x7e ] - \e[20~ F9
               case 0x31:
                 return SeqKey.f10; // [ 0x1b, 0x5b, 0x32, 0x31, 0x7e ] - \e[21~ F10
-              //case 0x??:
-              //return SeqKey.f11; // [ 0x1b, 0x5b, 0x32, 0x??, 0x7e ] - \e[2?~ F11
+              case 0x33:
+                return SeqKey.f11; //   [ 0x1b, 0x5b, 0x32, 0x33, 0x7e ] - \e[23~ F11
               case 0x34:
                 return SeqKey.f12; // [ 0x1b, 0x5b, 0x32, 0x34, 0x7e ] - \e[24~ F12
             }

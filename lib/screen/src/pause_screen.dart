@@ -1,8 +1,11 @@
+import 'package:rougish/config/config.dart' as config;
+import 'package:rougish/log/log.dart';
 import 'package:rougish/term/ansi.dart' as ansi;
 import 'package:rougish/term/terminal.dart' as term;
 import '../screen.dart';
 
 class PauseScreen extends Screen {
+  static const logLabel = 'PauseScreen';
   static const List<ScreenEvent> options = [ScreenEvent.resume, ScreenEvent.quit];
   final numOptions = options.length;
 
@@ -43,39 +46,27 @@ class PauseScreen extends Screen {
   }
 
   @override
-  void onString(String string) {/* no-op */}
-
-  @override
-  void onControlCode(int code) {
+  void onKeySequence(List<int> seq, String hash) {
+    Log.debug(logLabel, 'onKeySequence: ${hash}');
     ScreenEvent todo = ScreenEvent.nothing;
-    switch (code) {
-      case term.esc:
-        todo = options[0];
-        break;
-      case term.lf:
-        todo = options[_curOption];
-        break;
-      default:
-        break;
-    }
-    term.centerMessage(StringBuffer(), 'todo: \'${todo}\'', yOffset: 6);
-    broadcast(todo);
-  }
 
-  @override
-  void onControlSequence(List<int> codes) {
-    var seqKey = term.seqKeyFromCodes(codes);
-    switch (seqKey) {
-      case term.SeqKey.arrowUp:
-        _curOption = _wrap(_curOption, -1, numOptions);
-        break;
-      case term.SeqKey.arrowDown:
-        _curOption = _wrap(_curOption, 1, numOptions);
-        break;
-      default:
-        break;
+    if (config.isPause(hash)) {
+      todo = options[0];
+    } else if (config.isUp(hash)) {
+      _curOption = _wrap(_curOption, -1, numOptions);
+    } else if (config.isDown(hash)) {
+      _curOption = _wrap(_curOption, 1, numOptions);
+    } else if (term.isEnter(seq)) {
+      todo = options[_curOption];
     }
-    term.centerMessage(StringBuffer(), 'seqKey: ${seqKey}  curOption: ${_curOption}', yOffset: 6);
+
+    term.centerMessage(StringBuffer(), 'key hash: ${hash}  curOption: ${_curOption}', yOffset: 6);
+
+    if (todo != ScreenEvent.nothing) {
+      term.centerMessage(StringBuffer(), 'todo: \'${todo}\'', yOffset: 5);
+      _curOption = 0;
+      broadcast(todo);
+    }
   }
 
   @override
