@@ -6,6 +6,9 @@ import 'dart:io';
 
 import 'package:rougish/term/ansi.dart' as ansi;
 
+/// backspace
+const bs = 0x08;
+
 /// horizontal tab
 const ht = 0x09;
 
@@ -15,8 +18,8 @@ const lf = 0x0a;
 /// escape
 const esc = 0x1b;
 
-/// backspace
-const bs = 0x7f;
+/// delete
+const del = 0x7f;
 
 /// space
 const printableLo = 0x20;
