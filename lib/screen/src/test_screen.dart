@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:rougish/config/config.dart' as config;
 import 'package:rougish/term/ansi.dart' as ansi;
 import 'package:rougish/term/terminal.dart' as term;
 import '../screen.dart';
@@ -84,5 +85,7 @@ class TestScreen extends Screen {
     _announceSize(buffer);
     _stateMessage(buffer);
     _paintCorners(buffer);
+
+    term.centerMessage(buffer, 'listening for keys. ${config.globalConf['key-pause']} for menu.\n', yOffset: 3);
   }
 }

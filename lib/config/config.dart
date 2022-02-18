@@ -9,6 +9,13 @@ String _keyDownHash = '';
 String _keyLeftHash = '';
 String _keyRightHash = '';
 
+Map<String, String> _globalConf = {};
+Map<String, String> get globalConf => _globalConf;
+
+void setGlobalConf(Map<String, String> conf) {
+  _globalConf = conf;
+}
+
 LogLevel toLogLevel(String levelName) {
   switch (levelName.toLowerCase()) {
     case 'fatal':

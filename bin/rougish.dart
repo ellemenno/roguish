@@ -7,8 +7,8 @@ import 'package:rougish/term/terminal.dart' as term;
 import 'package:rougish/screen/screen.dart';
 
 const logLabel = 'rougish';
-final List<Screen> screenStack = [];
 final StringBuffer sb = StringBuffer();
+final List<Screen> screenStack = [];
 final Screen pause = Screen.pause();
 final Screen test = Screen.test();
 late final StreamSubscription<List<int>> termListener;
@@ -139,6 +139,7 @@ void addSignalListeners() {
 
 void main(List<String> arguments) {
   conf = config.fromFile('bin/rougish.conf');
+  config.setGlobalConf(conf);
 
   Log.toFile();
   Log.level = config.logLevel(conf);
@@ -158,7 +159,4 @@ void main(List<String> arguments) {
   });
 
   pushScreen(test, first: true);
-
-  term.centerMessage(sb, 'now listening. ${conf['key-pause']} for menu.\n', yOffset: -1);
-  Log.info(logLabel, 'test screen added. listening for user input on stdin.');
 }
