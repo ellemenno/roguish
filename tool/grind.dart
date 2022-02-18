@@ -47,6 +47,9 @@ void compile() {
   String inPath = path.join(binDir.path, '${name}.dart');
   String outPath = path.join(binDir.path, '${name}${ext}');
   run('dart', arguments: ['compile', 'exe', '--output', outPath, inPath]);
+
+  String prompt = Platform.isWindows ? '>' : '\$';
+  print('\nto run the new binary:\n${prompt} ${outPath}');
 }
 
 @Task('generates api docs')
