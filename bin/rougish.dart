@@ -25,7 +25,7 @@ void pushScreen(Screen screen, {bool first = false}) {
   currentScreen = screenStack.last;
   Log.info(logLabel, 'pushScreen() added ${screen.runtimeType} as new current screen');
   screenListener = currentScreen.listen(onScreenEvent);
-  currentScreen.draw(sb);
+  currentScreen.draw(sb); // push is additive; can get away with only drawing new screen
 }
 
 Screen popScreen() {
@@ -35,8 +35,16 @@ Screen popScreen() {
   screenListener = currentScreen.listen(onScreenEvent);
   Log.info(logLabel,
       'popScreen() removed ${screen.runtimeType}; current screen is ${currentScreen.runtimeType}');
-  currentScreen.draw(sb);
+  redrawScreens(); // pop is subtractive, new to redraw full stack
   return screen;
+}
+
+void redrawScreens() {
+  Log.debug(logLabel, 'redrawScreens() redrawing ${screenStack.length} screens from bottom up..');
+  // dart lists iterate from first added to last added, which gives us bottom to top of stack
+  for (final screen in screenStack) {
+    screen.draw(sb);
+  }
 }
 
 void showCodes(List<int> codes) {
@@ -44,9 +52,9 @@ void showCodes(List<int> codes) {
 }
 
 void onResize() {
-  Log.info(logLabel, 'onResize() redrawing ${screenStack.length} screens from bottom up..');
-  for (final screen in screenStack) {
-    screen.draw(sb); // bottom to top
+  Log.info(logLabel, 'onResize() call for redraw at new size..');
+  redrawScreens();
+}
   }
 }
 
