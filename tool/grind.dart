@@ -3,6 +3,7 @@ import 'package:grinder/grinder.dart';
 import 'package:path/path.dart' as path;
 
 const String name = 'rougish';
+final Directory docDir = Directory('doc');
 
 void main(List<String> args) => grind(args);
 
@@ -54,8 +55,7 @@ void compile() {
 
 @Task('generates api docs')
 void document() {
-  //Analyzer.analyze(existingSourceDirs, fatalWarnings: true);
-  //  regular dart command has better defaults and output formatting
+  delete(docDir);
   run('dart', arguments: ['doc', '--validate-links', '.']);
 }
 
