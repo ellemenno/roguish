@@ -6,6 +6,12 @@ import 'dart:io';
 
 import 'package:rougish/term/ansi.dart' as ansi;
 
+/// start of heading
+const sh = 0x01;
+
+/// enquiry
+const eq = 0x05;
+
 /// backspace
 const bs = 0x08;
 
@@ -31,6 +37,9 @@ const printableLo = 0x20;
 const printableHi = 0x7e;
 
 /// keycode sequences that can be reported by the terminal
+///
+/// note: on the keyboards tested, the Delete key reported an escape sequence, not the ASCII [del] code of `0x7f`.
+/// Linux and MacOS seem to use [del] for Backspace ([bs]).
 enum SeqKey {
   none,
   arrowUp,
@@ -63,9 +72,10 @@ enum SeqKey {
 var print = (String msg) => stderr.write(msg);
 var printBuffer = (StringBuffer sb) => stderr.write(sb.toString());
 
-/// Determine whether a given sequence of codes represents a printable character.
-/// This implementation only passes single code sequences for printable ASCII characters
-bool isPrintable(List<int> seq) {
+/// Determine whether a given sequence of codes represents a printable ASCII character.
+/// This implementation only passes single code sequences from `0x20` to `0x7e`
+/// (this excludes printable runes like emoji).
+bool isPrintableAscii(List<int> seq) {
   if (seq.length != 1) {
     return false;
   }
@@ -78,7 +88,25 @@ bool isPrintable(List<int> seq) {
   return true;
 }
 
+/// Determine whether a given sequence of codes represents the Backspace key.
+///
+/// Windows terminal reports backspace (`0x08`), while Linux shell reports delete (`0x7f`).
+bool isBackspace(List<int> seq) {
+  if (seq.length != 1) {
+    return false;
+  }
+  if (seq[0] == bs) {
+    return true;
+  }
+  if (seq[0] == del) {
+    return true;
+  }
+  return false;
+}
+
 /// Determine whether a given sequence of codes represents the Enter / Return key.
+///
+/// Windows terminal reports a carriage return (`0x0d`), while Linux and MacOS shells report line feed (`0x0a`).
 bool isEnter(List<int> seq) {
   if (seq.length != 1) {
     return false;
@@ -92,9 +120,65 @@ bool isEnter(List<int> seq) {
   return false;
 }
 
-/// Create an iterable list of hex code strings from given key codes
+/// Create an iterable list of hex code strings from given key codes.
 Iterable<String> codesToString(List<int> codes, {prefix = '0x'}) =>
     codes.map((e) => '${prefix}${e.toRadixString(16).padLeft(2, '0')}');
+
+/// Create a string hash of the keycode sequence.
+String codeHash(List<int> codes) {
+  return codesToString(codes, prefix: '').join('');
+}
+
+/// Match a given [codeHash] value to a [SeqKey] enumeration, including [SeqKey.none] if no match.
+SeqKey seqKeyFromCodeHash(String hash) {
+  switch (hash) {
+    case '1b5b41':
+      return SeqKey.arrowUp;
+    case '1b5b42':
+      return SeqKey.arrowDown;
+    case '1b5b43':
+      return SeqKey.arrowRight;
+    case '1b5b44':
+      return SeqKey.arrowLeft;
+    case '1b5b46':
+      return SeqKey.end;
+    case '1b5b47':
+      return SeqKey.home;
+    case '1b5b327e':
+      return SeqKey.insert;
+    case '1b5b337e':
+      return SeqKey.delete;
+    case '1b5b357e':
+      return SeqKey.pageUp;
+    case '1b5b367e':
+      return SeqKey.pageDown;
+    case '1b4f50':
+      return SeqKey.f1;
+    case '1b4f51':
+      return SeqKey.f2;
+    case '1b4f52':
+      return SeqKey.f3;
+    case '1b4f53':
+      return SeqKey.f4;
+    case '1b5b31357e':
+      return SeqKey.f5;
+    case '1b5b31377e':
+      return SeqKey.f6;
+    case '1b5b31387e':
+      return SeqKey.f7;
+    case '1b5b31397e':
+      return SeqKey.f8;
+    case '1b5b32307e':
+      return SeqKey.f9;
+    case '1b5b32317e':
+      return SeqKey.f10;
+    case '1b5b32337e':
+      return SeqKey.f11;
+    case '1b5b32347e':
+      return SeqKey.f12;
+  }
+  return SeqKey.none;
+}
 
 /// Match a given code sequence to a [SeqKey] enumeration, including [SeqKey.none] if no match.
 SeqKey seqKeyFromCodes(List<int> codes) {
@@ -221,22 +305,34 @@ void clear(StringBuffer sb) {
   printBuffer(sb);
 }
 
+/// Print the provided message at specific coordinates of the screen.
+///
+/// The provided stringbuffer is cleared and used to assemble the string to print.
+/// [xPos] sets the horizontal position of the message.
+/// [yPos] sets the vertical position of the message.
+/// [cll] if `true`, clears the row before printing.
+void placeMessage(StringBuffer sb, String msg, {int xPos = 0, int yPos = 0, bool cll = false}) {
+  sb.clear();
+  ansi.xy(sb, xPos, yPos);
+  if (cll) {
+    ansi.cll(sb);
+  }
+  sb.write(msg);
+  ansi.reset(sb);
+  printBuffer(sb);
+}
+
 /// Print the provided message in the middle of the screen.
 ///
 /// The provided stringbuffer is cleared and used to assemble the string to print.
 /// [xOffset] adjusts the horizontal position of the message.
 /// [yOffset] adjusts the vertical position of the message.
 /// [msgOffset] adjusts the calculated length of the message before centering.
-/// The entire row is cleared before the message is printed.
+/// [cll] if `true`, clears the row before printing.
 void centerMessage(StringBuffer sb, String msg,
-    {int xOffset = 0, int yOffset = 0, int msgOffset = 0}) {
+    {int xOffset = 0, int yOffset = 0, int msgOffset = 0, bool cll = false}) {
   List<int> dim = size();
   int x = (dim[0] / 2).floor() - ((msg.length + msgOffset) / 2).floor() + xOffset;
   int y = (dim[1] / 2).floor() + yOffset;
-  sb.clear();
-  ansi.xy(sb, x, y);
-  ansi.cll(sb);
-  sb.write(msg);
-  ansi.reset(sb);
-  printBuffer(sb);
+  placeMessage(sb, msg, xPos: x, yPos: y, cll: cll);
 }

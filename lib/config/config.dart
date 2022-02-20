@@ -3,11 +3,14 @@ import 'package:rougish/term/terminal.dart' as term;
 
 export 'src/from_file.dart' show fromFile;
 
+String _keyCommandBarHash = '';
+String _keyCursorLeftHash = '';
+String _keyCursorRightHash = '';
 String _keyPauseHash = '';
-String _keyUpHash = '';
-String _keyDownHash = '';
-String _keyLeftHash = '';
-String _keyRightHash = '';
+String _keyP1UpHash = '';
+String _keyP1DownHash = '';
+String _keyP1LeftHash = '';
+String _keyP1RightHash = '';
 
 Map<String, String> _globalConf = {};
 Map<String, String> get globalConf => _globalConf;
@@ -43,11 +46,19 @@ LogLevel logLevel(Map<String, String> conf, {defaultLevel = LogLevel.none}) {
   return toLogLevel(conf['log_level'] ?? defaultLevel);
 }
 
-int numBlocks(Map<String, String> conf, {defaultCount = 35}) {
-  return int.parse(conf['screen-test-num_blocks'] ?? defaultCount);
+List<int> keyCommandBar(Map<String, String> conf, {defaultCodes = '0x20'}) {
+  return toCodes(conf, 'key-command', defaultCodes);
 }
 
-List<int> keyPause(Map<String, String> conf, {defaultCodes = '0x20'}) {
+List<int> keyCursorLeft(Map<String, String> conf, {defaultCodes = '0x1b,0x5b,0x44'}) {
+  return toCodes(conf, 'key-cursor_left', defaultCodes);
+}
+
+List<int> keyCursorRight(Map<String, String> conf, {defaultCodes = '0x1b,0x5b,0x43'}) {
+  return toCodes(conf, 'key-cursor_right', defaultCodes);
+}
+
+List<int> keyPause(Map<String, String> conf, {defaultCodes = '0x60'}) {
   return toCodes(conf, 'key-pause', defaultCodes);
 }
 
@@ -67,34 +78,61 @@ List<int> keyRight(Map<String, String> conf, {player = 1, defaultCodes = '0x1b,0
   return toCodes(conf, 'key-p${player}_right', defaultCodes);
 }
 
-String codeHash(List<int> codes) {
-  return term.codesToString(codes, prefix: '').join('');
+void setKeys(Map<String, String> conf) {
+  _keyCommandBarHash = term.codeHash(keyCommandBar(conf));
+  _keyCursorLeftHash = term.codeHash(keyCursorLeft(conf));
+  _keyCursorRightHash = term.codeHash(keyCursorRight(conf));
+  _keyPauseHash = term.codeHash(keyPause(conf));
+  _keyP1UpHash = term.codeHash(keyUp(conf));
+  _keyP1DownHash = term.codeHash(keyDown(conf));
+  _keyP1LeftHash = term.codeHash(keyLeft(conf));
+  _keyP1RightHash = term.codeHash(keyRight(conf));
 }
 
-void setKeys(Map<String, String> conf) {
-  _keyPauseHash = codeHash(keyPause(conf));
-  _keyUpHash = codeHash(keyUp(conf));
-  _keyDownHash = codeHash(keyDown(conf));
-  _keyLeftHash = codeHash(keyLeft(conf));
-  _keyRightHash = codeHash(keyRight(conf));
+bool isCommandBar(String hash) {
+  return (hash == _keyCommandBarHash);
+}
+
+bool isCursorLeft(String hash) {
+  return (hash == _keyCursorLeftHash);
+}
+
+bool isCursorRight(String hash) {
+  return (hash == _keyCursorRightHash);
 }
 
 bool isPause(String hash) {
-  return hash == _keyPauseHash;
+  return (hash == _keyPauseHash);
 }
 
-bool isUp(String hash) {
-  return hash == _keyUpHash;
+bool isUp(String hash, {player = 1}) {
+  switch (player) {
+    case 1:
+      return (hash == _keyP1UpHash);
+  }
+  return false;
 }
 
-bool isDown(String hash) {
-  return hash == _keyDownHash;
+bool isDown(String hash, {player = 1}) {
+  switch (player) {
+    case 1:
+      return (hash == _keyP1DownHash);
+  }
+  return false;
 }
 
-bool isLeft(String hash) {
-  return hash == _keyLeftHash;
+bool isLeft(String hash, {player = 1}) {
+  switch (player) {
+    case 1:
+      return (hash == _keyP1LeftHash);
+  }
+  return false;
 }
 
-bool isRight(String hash) {
-  return hash == _keyRightHash;
+bool isRight(String hash, {player = 1}) {
+  switch (player) {
+    case 1:
+      return (hash == _keyP1RightHash);
+  }
+  return false;
 }

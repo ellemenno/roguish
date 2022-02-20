@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'src/command_screen.dart';
 import 'src/pause_screen.dart';
 import 'src/test_screen.dart';
 
@@ -7,6 +8,7 @@ enum ScreenEvent {
   nothing,
   quit,
   resume,
+  hideCommandBar,
 }
 
 abstract class Screen {
@@ -25,6 +27,9 @@ abstract class Screen {
 
   Screen();
 
+  factory Screen.command() {
+    return CommandScreen();
+  }
   factory Screen.pause() {
     return PauseScreen();
   }

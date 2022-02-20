@@ -16,7 +16,7 @@ class PauseScreen extends Screen {
     ' resume                ', // 0
     ' quit                  ', // 1
     '                       ',
-    ' (arrow up/down+enter) ',
+    '    (up/down+enter)    ',
     '-----------------------',
   ];
   int _curOption = 0;
@@ -32,16 +32,16 @@ class PauseScreen extends Screen {
   void _dialog(StringBuffer sb) {
     String lh;
     sb.clear();
-    term.centerMessage(sb, '.${_dlg[0]}.', yOffset: -3);
-    term.centerMessage(sb, '|${_dlg[1]}|', yOffset: -2);
-    term.centerMessage(sb, '|${_dlg[2]}|', yOffset: -1);
+    term.centerMessage(sb, ' .${_dlg[0]}. ', yOffset: -3);
+    term.centerMessage(sb, ' |${_dlg[1]}| ', yOffset: -2);
+    term.centerMessage(sb, ' |${_dlg[2]}| ', yOffset: -1);
     lh = _hilightSelected(_dlg[3], 0);
-    term.centerMessage(sb, '|${lh}|', yOffset: 0, msgOffset: (_dlg[3].length - lh.length));
+    term.centerMessage(sb, ' |${lh}| ', yOffset: 0, msgOffset: (_dlg[3].length - lh.length));
     lh = _hilightSelected(_dlg[4], 1);
-    term.centerMessage(sb, '|${lh}|', yOffset: 1, msgOffset: (_dlg[4].length - lh.length));
-    term.centerMessage(sb, '|${_dlg[5]}|', yOffset: 2);
-    term.centerMessage(sb, '|${_dlg[6]}|', yOffset: 3);
-    term.centerMessage(sb, '\'${_dlg[7]}\'', yOffset: 4);
+    term.centerMessage(sb, ' |${lh}| ', yOffset: 1, msgOffset: (_dlg[4].length - lh.length));
+    term.centerMessage(sb, ' |${_dlg[5]}| ', yOffset: 2);
+    term.centerMessage(sb, ' |${_dlg[6]}| ', yOffset: 3);
+    term.centerMessage(sb, ' \'${_dlg[7]}\' ', yOffset: 4);
     term.printBuffer(sb);
   }
 

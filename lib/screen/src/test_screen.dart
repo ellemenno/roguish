@@ -64,7 +64,7 @@ class TestScreen extends Screen {
 
   @override
   void onKeySequence(List<int> seq, String hash) {
-    if (!term.isPrintable(seq)) {
+    if (!term.isPrintableAscii(seq)) {
       return;
     }
 
@@ -86,6 +86,7 @@ class TestScreen extends Screen {
     _stateMessage(buffer);
     _paintCorners(buffer);
 
-    term.centerMessage(buffer, 'listening for keys. ${config.globalConf['key-pause']} for menu.\n', yOffset: 3);
+    term.centerMessage(buffer, 'listening for keys. ${config.globalConf['key-pause']} for menu.\n',
+        yOffset: 3);
   }
 }

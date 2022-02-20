@@ -9,6 +9,7 @@ import 'package:rougish/screen/screen.dart';
 const logLabel = 'rougish';
 final StringBuffer sb = StringBuffer();
 final List<Screen> screenStack = [];
+final Screen command = Screen.command();
 final Screen pause = Screen.pause();
 final Screen test = Screen.test();
 late final StreamSubscription<List<int>> termListener;
@@ -16,6 +17,7 @@ late Map<String, String> conf;
 late Screen currentScreen;
 late StreamSubscription<ScreenEvent> screenListener;
 bool paused = false;
+bool commandBarOpen = false;
 
 void pushScreen(Screen screen, {bool first = false}) {
   if (!first) {
@@ -55,7 +57,23 @@ void onResize() {
   Log.info(logLabel, 'onResize() call for redraw at new size..');
   redrawScreens();
 }
+
+void onShowCommandBar() {
+  if (commandBarOpen) {
+    return;
   }
+  Log.info(logLabel, 'onShowCommandBar() showing..');
+  commandBarOpen = true;
+  pushScreen(command);
+}
+
+void onHideCommandBar() {
+  if (!commandBarOpen) {
+    return;
+  }
+  Log.info(logLabel, 'onHideCommandBar() hiding..');
+  commandBarOpen = false;
+  popScreen();
 }
 
 void onPause() {
@@ -98,6 +116,9 @@ void onScreenEvent(ScreenEvent event) {
     case ScreenEvent.resume:
       onResume();
       break;
+    case ScreenEvent.hideCommandBar:
+      onHideCommandBar();
+      break;
     case ScreenEvent.quit:
       onQuit();
       break;
@@ -119,9 +140,13 @@ void onData(List<int> codes) {
 
   showCodes(codes);
 
-  String codeHash = config.codeHash(codes);
+  String codeHash = term.codeHash(codes);
 
-  if (!paused && config.isPause(codeHash)) {
+  if (commandBarOpen) {
+    onKeySequence(codes, codeHash);
+  } else if (config.isCommandBar(codeHash)) {
+    onShowCommandBar();
+  } else if (!paused && config.isPause(codeHash)) {
     onPause();
   } else {
     onKeySequence(codes, codeHash);
