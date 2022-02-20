@@ -8,14 +8,13 @@ import 'package:rougish/term/terminal.dart' as term;
 import 'package:rougish/screen/screen.dart';
 
 const logLabel = 'rougish';
-final StringBuffer sb = StringBuffer();
+final StringBuffer screenBuffer = StringBuffer();
 final List<Screen> screenStack = [];
 final Screen command = Screen.command();
 final Screen pause = Screen.pause();
 final Screen test = Screen.test();
 late final StreamSubscription<List<int>> termListener;
 late final GameData state;
-late Map<String, String> conf;
 late Screen currentScreen;
 late StreamSubscription<ScreenEvent> screenListener;
 bool paused = false;
@@ -29,7 +28,7 @@ void pushScreen(Screen screen, {bool first = false}) {
   currentScreen = screenStack.last;
   Log.info(logLabel, 'pushScreen() added ${screen.runtimeType} as new current screen');
   screenListener = currentScreen.listen(onScreenEvent);
-  currentScreen.draw(sb, state); // push is additive; can get away with only drawing new screen
+  currentScreen.draw(screenBuffer, state); // push is additive; can get away with only drawing new screen
 }
 
 Screen popScreen() {
@@ -47,12 +46,12 @@ void redrawScreens() {
   Log.debug(logLabel, 'redrawScreens() redrawing ${screenStack.length} screens from bottom up..');
   // dart lists iterate from first added to last added, which gives us bottom to top of stack
   for (final screen in screenStack) {
-    screen.draw(sb, state);
+    screen.draw(screenBuffer, state);
   }
 }
 
 void showCodes(List<int> codes) {
-  term.centerMessage(sb, '${term.codesToString(codes)}\n', yOffset: -7);
+  term.centerMessage(screenBuffer, '${term.codesToString(codes)}\n', yOffset: -7);
 }
 
 void onResize() {
@@ -100,7 +99,7 @@ void onQuit() {
   Log.info(logLabel, 'onQuit() quitting..');
   screenListener.cancel();
   termListener.cancel();
-  term.clear(sb);
+  term.clear(screenBuffer);
   term.print('thank you for playing.\n');
   term.showCursor();
   exit(0);
@@ -109,7 +108,7 @@ void onQuit() {
 void onKeySequence(List<int> seq, String hash) {
   Log.debug(logLabel, 'onKeySequence() ${hash}');
   currentScreen.onKeySequence(seq, hash, state);
-  currentScreen.draw(sb, state);
+  currentScreen.draw(screenBuffer, state);
 }
 
 void onScreenEvent(ScreenEvent event) {
@@ -125,7 +124,7 @@ void onScreenEvent(ScreenEvent event) {
       onQuit();
       break;
     default:
-      term.centerMessage(sb, 'screen event: ${event}; (no action)\n', yOffset: -6);
+      term.centerMessage(screenBuffer, 'screen event: ${event}; (no action)\n', yOffset: -6);
   }
 }
 
@@ -173,17 +172,16 @@ void addSignalListeners() {
 }
 
 void main(List<String> arguments) {
-  conf = config.fromFile('bin/rougish.conf');
-  state = GameData(conf);
+  state = GameData(config.fromFile('bin/rougish.conf'));
 
   Log.toFile();
-  Log.level = config.logLevel(conf);
+  Log.level = config.logLevel(state.conf);
   Log.info(logLabel, 'app startup. logging initialized at ${Log.level}. args = ${arguments}');
-  Log.debug(logLabel, 'conf = ${conf}');
+  Log.debug(logLabel, 'conf = ${state.conf}');
 
-  config.setKeys(conf);
+  config.setKeys(state.conf);
 
-  term.clear(sb);
+  term.clear(screenBuffer);
   term.hideCursor();
 
   runZonedGuarded(() {
