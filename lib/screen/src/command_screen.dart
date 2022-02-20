@@ -1,4 +1,5 @@
 import 'package:rougish/config/config.dart' as config;
+import 'package:rougish/game/game_data.dart';
 import 'package:rougish/log/log.dart';
 import 'package:rougish/term/terminal.dart' as term;
 import 'package:rougish/term/typing_buffer.dart';
@@ -24,7 +25,7 @@ class CommandScreen extends Screen {
   }
 
   @override
-  void onKeySequence(List<int> seq, String hash) {
+  void onKeySequence(List<int> seq, String hash, GameData state) {
     Log.debug(logLabel, 'onKeySequence: ${hash}');
 
     ScreenEvent todo = ScreenEvent.nothing;
@@ -55,7 +56,7 @@ class CommandScreen extends Screen {
 
     if (_input.modified) {
       _input.resetModified();
-      draw(_tmp);
+      draw(_tmp, state);
     }
 
     if (todo != ScreenEvent.nothing) {
@@ -64,7 +65,7 @@ class CommandScreen extends Screen {
   }
 
   @override
-  void draw(StringBuffer buffer) {
+  void draw(StringBuffer buffer, GameData state) {
     _input.toStringBuffer(_cmd);
     term.placeMessage(buffer, '> ${_cmd}', xPos: 0, yPos: 0, cll: true);
   }

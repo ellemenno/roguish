@@ -1,4 +1,5 @@
 import 'package:rougish/config/config.dart' as config;
+import 'package:rougish/game/game_data.dart';
 import 'package:rougish/log/log.dart';
 import 'package:rougish/term/ansi.dart' as ansi;
 import 'package:rougish/term/terminal.dart' as term;
@@ -46,7 +47,7 @@ class PauseScreen extends Screen {
   }
 
   @override
-  void onKeySequence(List<int> seq, String hash) {
+  void onKeySequence(List<int> seq, String hash, GameData state) {
     Log.debug(logLabel, 'onKeySequence: ${hash}');
     ScreenEvent todo = ScreenEvent.nothing;
 
@@ -70,7 +71,7 @@ class PauseScreen extends Screen {
   }
 
   @override
-  void draw(StringBuffer buffer) {
+  void draw(StringBuffer buffer, GameData state) {
     _dialog(buffer);
   }
 }

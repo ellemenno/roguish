@@ -12,13 +12,6 @@ String _keyP1DownHash = '';
 String _keyP1LeftHash = '';
 String _keyP1RightHash = '';
 
-Map<String, String> _globalConf = {};
-Map<String, String> get globalConf => _globalConf;
-
-void setGlobalConf(Map<String, String> conf) {
-  _globalConf = conf;
-}
-
 LogLevel toLogLevel(String levelName) {
   switch (levelName.toLowerCase()) {
     case 'fatal':

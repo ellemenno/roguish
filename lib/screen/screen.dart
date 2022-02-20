@@ -1,6 +1,9 @@
 import 'dart:async';
 
+import 'package:rougish/game/game_data.dart';
+
 import 'src/command_screen.dart';
+import 'src/level_screen.dart';
 import 'src/pause_screen.dart';
 import 'src/test_screen.dart';
 
@@ -22,8 +25,8 @@ abstract class Screen {
     _eventBroadcaster.add(event);
   }
 
-  void onKeySequence(List<int> seq, String hash);
-  void draw(StringBuffer buffer);
+  void onKeySequence(List<int> seq, String hash, GameData state);
+  void draw(StringBuffer buffer, GameData state);
 
   Screen();
 

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:rougish/config/config.dart' as config;
+import 'package:rougish/game/game_data.dart';
 import 'package:rougish/log/log.dart';
 import 'package:rougish/term/terminal.dart' as term;
 import 'package:rougish/screen/screen.dart';
@@ -13,6 +14,7 @@ final Screen command = Screen.command();
 final Screen pause = Screen.pause();
 final Screen test = Screen.test();
 late final StreamSubscription<List<int>> termListener;
+late final GameData state;
 late Map<String, String> conf;
 late Screen currentScreen;
 late StreamSubscription<ScreenEvent> screenListener;
@@ -27,7 +29,7 @@ void pushScreen(Screen screen, {bool first = false}) {
   currentScreen = screenStack.last;
   Log.info(logLabel, 'pushScreen() added ${screen.runtimeType} as new current screen');
   screenListener = currentScreen.listen(onScreenEvent);
-  currentScreen.draw(sb); // push is additive; can get away with only drawing new screen
+  currentScreen.draw(sb, state); // push is additive; can get away with only drawing new screen
 }
 
 Screen popScreen() {
@@ -45,7 +47,7 @@ void redrawScreens() {
   Log.debug(logLabel, 'redrawScreens() redrawing ${screenStack.length} screens from bottom up..');
   // dart lists iterate from first added to last added, which gives us bottom to top of stack
   for (final screen in screenStack) {
-    screen.draw(sb);
+    screen.draw(sb, state);
   }
 }
 
@@ -106,8 +108,8 @@ void onQuit() {
 
 void onKeySequence(List<int> seq, String hash) {
   Log.debug(logLabel, 'onKeySequence() ${hash}');
-  currentScreen.onKeySequence(seq, hash);
-  currentScreen.draw(sb);
+  currentScreen.onKeySequence(seq, hash, state);
+  currentScreen.draw(sb, state);
 }
 
 void onScreenEvent(ScreenEvent event) {
@@ -172,7 +174,7 @@ void addSignalListeners() {
 
 void main(List<String> arguments) {
   conf = config.fromFile('bin/rougish.conf');
-  config.setGlobalConf(conf);
+  state = GameData(conf);
 
   Log.toFile();
   Log.level = config.logLevel(conf);
