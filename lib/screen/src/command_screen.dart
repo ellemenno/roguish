@@ -7,7 +7,6 @@ import '../screen.dart';
 
 class CommandScreen extends Screen {
   static const logLabel = 'CommandScreen';
-  final StringBuffer _tmp = StringBuffer();
   final StringBuffer _cmd = StringBuffer();
   final TypingBuffer _input = TypingBuffer();
 
@@ -56,7 +55,7 @@ class CommandScreen extends Screen {
 
     if (_input.modified) {
       _input.resetModified();
-      draw(_tmp, state);
+      draw(state);
     }
 
     if (todo != ScreenEvent.nothing) {
@@ -65,8 +64,8 @@ class CommandScreen extends Screen {
   }
 
   @override
-  void draw(StringBuffer buffer, GameData state) {
+  void draw(GameData state) {
     _input.toStringBuffer(_cmd);
-    term.placeMessage(buffer, '> ${_cmd}', xPos: 0, yPos: 0, cll: true);
+    term.placeMessage(screenBuffer, '> ${_cmd}', xPos: 0, yPos: 0, cll: true);
   }
 }

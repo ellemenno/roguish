@@ -8,14 +8,16 @@ class TitleScreen extends Screen {
 
   @override
   void onKeySequence(List<int> seq, String hash, GameData state) {
-    Log.info(logLabel, 'any key detected. advancing to title..');
-    broadcast(ScreenEvent.titleToSetup);
+    if (term.isEnter(seq)) {
+      Log.info(logLabel, 'Enter key detected. advancing to title..');
+      broadcast(ScreenEvent.titleToSetup);
+    }
   }
 
   @override
-  void draw(StringBuffer buffer, GameData state) {
-    term.clear(buffer, hideCursor: true, clearHistory: true);
-    term.centerMessage(buffer, 'Rougish', yOffset: -3);
-    term.centerMessage(buffer, '<press any key to begin>', yOffset: 3);
+  void draw(GameData state) {
+    term.clear(screenBuffer, hideCursor: true, clearHistory: true);
+    term.centerMessage(screenBuffer, 'Rougish', yOffset: -3);
+    term.centerMessage(screenBuffer, '<press Enter key to continue>', yOffset: 3);
   }
 }

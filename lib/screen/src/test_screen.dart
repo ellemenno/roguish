@@ -77,16 +77,16 @@ class TestScreen extends Screen {
   }
 
   @override
-  void draw(StringBuffer buffer, GameData state) {
-    term.clear(buffer, hideCursor: true, clearHistory: true);
+  void draw(GameData state) {
+    term.clear(screenBuffer, hideCursor: true, clearHistory: true);
 
-    _randoBlocks(buffer, n: 35);
-    _testAnsi(buffer);
-    _announceSize(buffer);
-    _stateMessage(buffer);
-    _paintCorners(buffer);
+    _randoBlocks(screenBuffer, n: 35);
+    _testAnsi(screenBuffer);
+    _announceSize(screenBuffer);
+    _stateMessage(screenBuffer);
+    _paintCorners(screenBuffer);
 
-    term.centerMessage(buffer, 'listening for keys. ${state.conf['key-pause']} for menu.',
+    term.centerMessage(screenBuffer, 'listening for keys. ${state.conf['key-pause']} for menu.',
         yOffset: 3);
   }
 }

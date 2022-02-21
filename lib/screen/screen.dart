@@ -17,6 +17,11 @@ enum ScreenEvent {
 }
 
 abstract class Screen {
+  static final StringBuffer _sb = StringBuffer();
+
+  final StringBuffer _tmp;
+  StringBuffer get screenBuffer => _tmp;
+
   final StreamController<ScreenEvent> _eventBroadcaster = StreamController<ScreenEvent>.broadcast();
 
   StreamSubscription<ScreenEvent> listen(void Function(ScreenEvent) eventHandler) {
@@ -28,9 +33,10 @@ abstract class Screen {
   }
 
   void onKeySequence(List<int> seq, String hash, GameData state);
-  void draw(StringBuffer buffer, GameData state);
+  void draw(GameData state);
 
-  Screen();
+  Screen() : _tmp = _sb; // all screens share/reuse the same temp string buffer
+
 
   factory Screen.command() {
     return CommandScreen();

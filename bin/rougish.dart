@@ -8,7 +8,7 @@ import 'package:rougish/term/terminal.dart' as term;
 import 'package:rougish/screen/screen.dart';
 
 const logLabel = 'rougish';
-final StringBuffer screenBuffer = StringBuffer();
+final StringBuffer termBuffer = StringBuffer();
 final List<Screen> screenStack = [];
 final Screen command = Screen.command();
 final Screen pause = Screen.pause();
@@ -29,7 +29,8 @@ void pushScreen(Screen screen) {
   currentScreen = screenStack.last;
   Log.info(logLabel, 'pushScreen() added ${screen.runtimeType} as new current screen');
   screenListener = currentScreen.listen(onScreenEvent);
-  currentScreen.draw(screenBuffer, state); // push is additive; can get away with only drawing new screen
+  // push is additive; can get away with only drawing new screen
+  currentScreen.draw(state);
 }
 
 Screen popScreen() {
@@ -43,7 +44,8 @@ Screen popScreen() {
     screenListener = currentScreen.listen(onScreenEvent);
     Log.info(logLabel,
         'popScreen() removed ${screen.runtimeType}; current screen is ${currentScreen.runtimeType}');
-    redrawScreens(); // pop is subtractive, new to redraw full stack
+    // pop is subtractive, need to redraw full stack
+    redrawScreens();
   }
   return screen;
 }
@@ -52,12 +54,12 @@ void redrawScreens() {
   Log.debug(logLabel, 'redrawScreens() redrawing ${screenStack.length} screens from bottom up..');
   // dart lists iterate from first added to last added, which gives us bottom to top of stack
   for (final screen in screenStack) {
-    screen.draw(screenBuffer, state);
+    screen.draw(state);
   }
 }
 
 void showCodes(List<int> codes) {
-  term.placeMessageRelative(screenBuffer, '${term.codesToString(codes)}', yPercent: 100);
+  term.placeMessageRelative(termBuffer, '${term.codesToString(codes)}', yPercent: 100);
 }
 
 void onResize() {
@@ -111,7 +113,7 @@ void onQuit() {
   Log.info(logLabel, 'onQuit() quitting..');
   screenListener.cancel();
   termListener.cancel();
-  term.clear(screenBuffer, hideCursor: true, clearHistory: true);
+  term.clear(termBuffer, hideCursor: true, clearHistory: true);
   term.print('thank you for playing.\n');
   term.showCursor();
   exit(0);
@@ -138,7 +140,7 @@ void onScreenEvent(ScreenEvent event) {
       onTitleToSetup();
       break;
     default:
-      term.centerMessage(screenBuffer, 'screen event: ${event}; (no action)', yOffset: -6);
+      term.centerMessage(termBuffer, 'screen event: ${event}; (no action)', yOffset: -6);
   }
 }
 
@@ -195,7 +197,7 @@ void main(List<String> arguments) {
 
   config.setKeys(state.conf);
 
-  term.clear(screenBuffer, hideCursor: true, clearHistory: true);
+  term.clear(termBuffer, hideCursor: true, clearHistory: true);
 
   runZonedGuarded(() {
     termListener = term.listen(onData, onError);

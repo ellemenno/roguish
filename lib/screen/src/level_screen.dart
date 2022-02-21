@@ -11,7 +11,11 @@ class LevelScreen extends Screen {
   }
 
   @override
-  void draw(StringBuffer buffer, GameData state) {
+  void draw(GameData state) {
+    if (state.levelMap.length == 0) {
+      term.centerMessage(screenBuffer, 'time to make the donuts!', yOffset: 0);
+      //mapMaker.generate(state.levelMap);
+    }
     // TODO: draw state.levelMap
   }
 }
