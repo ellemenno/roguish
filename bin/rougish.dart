@@ -159,9 +159,7 @@ void onData(List<int> codes) {
 
   String codeHash = term.codeHash(codes);
 
-  if (commandBarOpen) {
-    onKeySequence(codes, codeHash);
-  } else if (config.isCommandBar(codeHash)) {
+  if (!commandBarOpen && config.isCommandBar(codeHash)) {
     onShowCommandBar();
   } else if (!paused && config.isPause(codeHash)) {
     onPause();
