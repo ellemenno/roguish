@@ -7,8 +7,7 @@ class LevelScreen extends Screen {
   static const logLabel = 'LevelScreen';
 
   @override
-  void onKeySequence(List<int> seq, String hash, GameData state) {
-  }
+  void onKeySequence(List<int> seq, String hash, GameData state) {}
 
   @override
   void draw(GameData state) {

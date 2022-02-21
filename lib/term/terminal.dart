@@ -302,9 +302,14 @@ void clear(StringBuffer sb, {hideCursor = false, clearHistory = false}) {
   sb.clear();
   ansi.reset(sb);
   ansi.xy(sb, 1, 1);
-  if (clearHistory) { sb.write(ansi.ris); }
-  else { ansi.cls(sb, n: 2); }
-  if (hideCursor) { sb.write(ansi.hide); }
+  if (clearHistory) {
+    sb.write(ansi.ris);
+  } else {
+    ansi.cls(sb, n: 2);
+  }
+  if (hideCursor) {
+    sb.write(ansi.hide);
+  }
   printBuffer(sb);
 }
 
@@ -333,10 +338,11 @@ void placeMessage(StringBuffer sb, String msg, {int xPos = 0, int yPos = 0, bool
 /// [xOffset] adjusts the horizontal position of the message (in absolute columns, not percent).
 /// [yOffset] adjusts the vertical position of the message (in absolute rows, not percent).
 /// [cll] if `true`, clears the row before printing.
-void placeMessageRelative(StringBuffer sb, String msg, {int xPercent = 0, int yPercent = 0, int xOffset = 0, int yOffset = 0, bool cll = false}) {
+void placeMessageRelative(StringBuffer sb, String msg,
+    {int xPercent = 0, int yPercent = 0, int xOffset = 0, int yOffset = 0, bool cll = false}) {
   List<int> dim = size();
-  int x = (dim[0] * xPercent/100).floor() + xOffset;
-  int y = (dim[1] * yPercent/100).floor() + yOffset;
+  int x = (dim[0] * xPercent / 100).floor() + xOffset;
+  int y = (dim[1] * yPercent / 100).floor() + yOffset;
   placeMessage(sb, msg, xPos: x, yPos: y, cll: cll);
 }
 
