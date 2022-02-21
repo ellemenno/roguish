@@ -293,15 +293,18 @@ void showCursor() {
   print(ansi.show);
 }
 
-/// Clear the screen and reset the cursor.
+/// Clear the screen and move the cursor to 0,0 (top left corner).
 ///
 /// The provided stringbuffer is cleared and filled with ANSI codes to reset styles,
 /// clear the screen, and position the cursor in the top left corner.
-void clear(StringBuffer sb) {
+/// Optionally, scrollback history can be cleared, and the cursor can be hidden.
+void clear(StringBuffer sb, {hideCursor = false, clearHistory = false}) {
   sb.clear();
   ansi.reset(sb);
   ansi.xy(sb, 1, 1);
-  ansi.cls(sb, n: 2);
+  if (clearHistory) { sb.write(ansi.ris); }
+  else { ansi.cls(sb, n: 2); }
+  if (hideCursor) { sb.write(ansi.hide); }
   printBuffer(sb);
 }
 
@@ -320,6 +323,21 @@ void placeMessage(StringBuffer sb, String msg, {int xPos = 0, int yPos = 0, bool
   sb.write(msg);
   ansi.reset(sb);
   printBuffer(sb);
+}
+
+/// Print the provided message at relative coordinates of the screen.
+///
+/// The provided stringbuffer is cleared and used to assemble the string to print.
+/// [xPercent] sets the horizontal position of the message. `0` maps to the first column (left-most), `100` to the last (right-most).
+/// [yPercent] sets the vertical position of the message. `0` maps to the first row (top), `100` maps to the last row (bottom).
+/// [xOffset] adjusts the horizontal position of the message (in absolute columns, not percent).
+/// [yOffset] adjusts the vertical position of the message (in absolute rows, not percent).
+/// [cll] if `true`, clears the row before printing.
+void placeMessageRelative(StringBuffer sb, String msg, {int xPercent = 0, int yPercent = 0, int xOffset = 0, int yOffset = 0, bool cll = false}) {
+  List<int> dim = size();
+  int x = (dim[0] * xPercent/100).floor() + xOffset;
+  int y = (dim[1] * yPercent/100).floor() + yOffset;
+  placeMessage(sb, msg, xPos: x, yPos: y, cll: cll);
 }
 
 /// Print the provided message in the middle of the screen.

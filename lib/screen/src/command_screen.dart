@@ -49,7 +49,7 @@ class CommandScreen extends Screen {
     } else if (seq[0] == term.eq) {
       _input.cursorEnd();
     }
-    // process control keys first, then printables
+    // process printables after control keys
     else if (term.isPrintableAscii(seq)) {
       _input.write(seq[0]);
     }

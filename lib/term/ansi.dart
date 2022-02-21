@@ -1,6 +1,9 @@
 /// helper functions for ansi codes.
 library ansi;
 
+/// Reset to Initial State: clears screen and history and shows cursor
+const ris = '\x1bc';
+
 /// Control Sequence Introducer
 const csi = '\x1b[';
 
@@ -13,7 +16,7 @@ const flip = '${csi}7m';
 /// Restores foreground and background
 const flop = '${csi}27m';
 
-/// Clears whole screen (see [cls] for more options)
+/// Clears whole screen (but not scrollback history); see [cls] for more options.
 const clear = '${csi}2J';
 
 /// Hides cursor
@@ -63,7 +66,7 @@ void c16(StringBuffer sb, String msg,
 ///
 /// [cRGB] supports 16.7M colors from 8-bit RGB hex strings (commonly used for CSS web colors).
 ///
-/// `-1` is interpreted as 'no color', meaning that ansi code is omitted
+/// `-1` ([none]) is interpreted as 'no color', meaning that ansi code is omitted
 void cRGB(StringBuffer sb, String msg, {int fg = 0x999999, int bg = none}) {
   // 16.7M color palette
   // R,G,B: [0..255]
@@ -101,6 +104,7 @@ void xy(StringBuffer sb, int x, int y) {
 /// - `0` from cursor to start (0,0)
 /// - `1` from cursor to end (terminalColumns, terminalLines)
 /// - `2` entire screen
+/// - `3` entire screen and scrollback buffer (not supported in all terminals, see [ris] for an alternative)
 void cls(StringBuffer sb, {int n = 2}) {
   // clear screen
   // \e[nJ, n=0 cursor to start, n=1 cursor to end, n=2 all

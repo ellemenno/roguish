@@ -12,7 +12,8 @@ final StringBuffer screenBuffer = StringBuffer();
 final List<Screen> screenStack = [];
 final Screen command = Screen.command();
 final Screen pause = Screen.pause();
-final Screen test = Screen.test();
+final Screen title = Screen.title();
+final Screen setup = Screen.setup();
 late final StreamSubscription<List<int>> termListener;
 late final GameData state;
 late Screen currentScreen;
@@ -20,8 +21,8 @@ late StreamSubscription<ScreenEvent> screenListener;
 bool paused = false;
 bool commandBarOpen = false;
 
-void pushScreen(Screen screen, {bool first = false}) {
-  if (!first) {
+void pushScreen(Screen screen) {
+  if (screenStack.length > 0) {
     screenListener.cancel();
   }
   screenStack.add(screen);
@@ -32,13 +33,18 @@ void pushScreen(Screen screen, {bool first = false}) {
 }
 
 Screen popScreen() {
+  if (screenStack.length == 0) {
+    throw Exception('popScreen() called when screenStack was empty.');
+  }
   screenListener.cancel();
   Screen screen = screenStack.removeLast();
-  currentScreen = screenStack.last;
-  screenListener = currentScreen.listen(onScreenEvent);
-  Log.info(logLabel,
-      'popScreen() removed ${screen.runtimeType}; current screen is ${currentScreen.runtimeType}');
-  redrawScreens(); // pop is subtractive, new to redraw full stack
+  if (screenStack.length > 0) {
+    currentScreen = screenStack.last;
+    screenListener = currentScreen.listen(onScreenEvent);
+    Log.info(logLabel,
+        'popScreen() removed ${screen.runtimeType}; current screen is ${currentScreen.runtimeType}');
+    redrawScreens(); // pop is subtractive, new to redraw full stack
+  }
   return screen;
 }
 
@@ -51,7 +57,7 @@ void redrawScreens() {
 }
 
 void showCodes(List<int> codes) {
-  term.centerMessage(screenBuffer, '${term.codesToString(codes)}\n', yOffset: -7);
+  term.placeMessageRelative(screenBuffer, '${term.codesToString(codes)}', yPercent: 100);
 }
 
 void onResize() {
@@ -95,11 +101,17 @@ void onResume() {
   popScreen();
 }
 
+void onTitleToSetup() {
+  Log.info(logLabel, 'onTitleToSetup() advancing from title screen to setup screen..');
+  popScreen(); // remove title
+  pushScreen(setup); // add setup
+}
+
 void onQuit() {
   Log.info(logLabel, 'onQuit() quitting..');
   screenListener.cancel();
   termListener.cancel();
-  term.clear(screenBuffer);
+  term.clear(screenBuffer, hideCursor: true, clearHistory: true);
   term.print('thank you for playing.\n');
   term.showCursor();
   exit(0);
@@ -108,23 +120,25 @@ void onQuit() {
 void onKeySequence(List<int> seq, String hash) {
   Log.debug(logLabel, 'onKeySequence() ${hash}');
   currentScreen.onKeySequence(seq, hash, state);
-  currentScreen.draw(screenBuffer, state);
 }
 
 void onScreenEvent(ScreenEvent event) {
   Log.debug(logLabel, 'onScreenEvent() ${event.name}');
   switch (event) {
+    case ScreenEvent.quit:
+      onQuit();
+      break;
     case ScreenEvent.resume:
       onResume();
       break;
     case ScreenEvent.hideCommandBar:
       onHideCommandBar();
       break;
-    case ScreenEvent.quit:
-      onQuit();
+    case ScreenEvent.titleToSetup:
+      onTitleToSetup();
       break;
     default:
-      term.centerMessage(screenBuffer, 'screen event: ${event}; (no action)\n', yOffset: -6);
+      term.centerMessage(screenBuffer, 'screen event: ${event}; (no action)', yOffset: -6);
   }
 }
 
@@ -181,8 +195,7 @@ void main(List<String> arguments) {
 
   config.setKeys(state.conf);
 
-  term.clear(screenBuffer);
-  term.hideCursor();
+  term.clear(screenBuffer, hideCursor: true, clearHistory: true);
 
   runZonedGuarded(() {
     termListener = term.listen(onData, onError);
@@ -191,5 +204,5 @@ void main(List<String> arguments) {
     Log.warn(logLabel, 'listener zone exception: ${e}');
   });
 
-  pushScreen(test, first: true);
+  pushScreen(title);
 }

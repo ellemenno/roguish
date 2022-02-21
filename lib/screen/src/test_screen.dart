@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:rougish/config/config.dart' as config;
 import 'package:rougish/game/game_data.dart';
 import 'package:rougish/term/ansi.dart' as ansi;
 import 'package:rougish/term/terminal.dart' as term;
@@ -79,7 +78,7 @@ class TestScreen extends Screen {
 
   @override
   void draw(StringBuffer buffer, GameData state) {
-    term.clear(buffer);
+    term.clear(buffer, hideCursor: true, clearHistory: true);
 
     _randoBlocks(buffer, n: 35);
     _testAnsi(buffer);
@@ -87,7 +86,7 @@ class TestScreen extends Screen {
     _stateMessage(buffer);
     _paintCorners(buffer);
 
-    term.centerMessage(buffer, 'listening for keys. ${state.conf['key-pause']} for menu.\n',
+    term.centerMessage(buffer, 'listening for keys. ${state.conf['key-pause']} for menu.',
         yOffset: 3);
   }
 }

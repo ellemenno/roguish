@@ -5,13 +5,15 @@ import 'package:rougish/game/game_data.dart';
 import 'src/command_screen.dart';
 import 'src/level_screen.dart';
 import 'src/pause_screen.dart';
-import 'src/test_screen.dart';
+import 'src/setup_screen.dart';
+import 'src/title_screen.dart';
 
 enum ScreenEvent {
   nothing,
   quit,
   resume,
   hideCommandBar,
+  titleToSetup,
 }
 
 abstract class Screen {
@@ -36,7 +38,13 @@ abstract class Screen {
   factory Screen.pause() {
     return PauseScreen();
   }
-  factory Screen.test() {
-    return TestScreen();
+  factory Screen.title() {
+    return TitleScreen();
+  }
+  factory Screen.setup() {
+    return SetupScreen();
+  }
+  factory Screen.level() {
+    return LevelScreen();
   }
 }
