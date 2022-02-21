@@ -19,14 +19,14 @@ class CommandScreen extends Screen {
     switch (parts.first) {
       case 'quit':
         return ScreenEvent.quit;
+      case 'debrief':
+        return ScreenEvent.debrief;
     }
     return ScreenEvent.nothing;
   }
 
   @override
   void onKeySequence(List<int> seq, String hash, GameData state) {
-    Log.debug(logLabel, 'onKeySequence: ${hash}');
-
     ScreenEvent todo = ScreenEvent.nothing;
 
     if (config.isCommandBar(hash)) {

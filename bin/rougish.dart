@@ -14,6 +14,8 @@ final Screen command = Screen.command();
 final Screen pause = Screen.pause();
 final Screen title = Screen.title();
 final Screen setup = Screen.setup();
+final Screen level = Screen.level();
+final Screen debrief = Screen.debrief();
 late final StreamSubscription<List<int>> termListener;
 late final GameData state;
 late Screen currentScreen;
@@ -109,6 +111,18 @@ void onTitleToSetup() {
   pushScreen(setup); // add setup
 }
 
+void onSetupToLevel() {
+  Log.info(logLabel, 'onSetupToLevel() advancing from setup screen to level screen..');
+  popScreen(); // remove setup
+  pushScreen(level); // add level
+}
+
+void onDebrief() {
+  Log.info(logLabel, 'onDebrief() game over, showing stats summary..');
+  popScreen(); // remove level
+  pushScreen(debrief); // add debrief
+}
+
 void onQuit() {
   Log.info(logLabel, 'onQuit() quitting..');
   screenListener.cancel();
@@ -138,6 +152,12 @@ void onScreenEvent(ScreenEvent event) {
       break;
     case ScreenEvent.titleToSetup:
       onTitleToSetup();
+      break;
+    case ScreenEvent.setupToLevel:
+      onSetupToLevel();
+      break;
+    case ScreenEvent.debrief:
+      onDebrief();
       break;
     default:
       term.centerMessage(termBuffer, 'screen event: ${event}; (no action)', yOffset: -6);

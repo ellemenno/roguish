@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:rougish/game/game_data.dart';
 
 import 'src/command_screen.dart';
+import 'src/debrief_screen.dart';
 import 'src/level_screen.dart';
 import 'src/pause_screen.dart';
 import 'src/setup_screen.dart';
@@ -14,6 +15,8 @@ enum ScreenEvent {
   resume,
   hideCommandBar,
   titleToSetup,
+  setupToLevel,
+  debrief,
 }
 
 abstract class Screen {
@@ -52,5 +55,8 @@ abstract class Screen {
   }
   factory Screen.level() {
     return LevelScreen();
+  }
+  factory Screen.debrief() {
+    return DebriefScreen();
   }
 }
