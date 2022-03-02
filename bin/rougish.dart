@@ -8,7 +8,6 @@ import 'package:rougish/term/terminal.dart' as term;
 import 'package:rougish/screen/screen.dart';
 
 const logLabel = 'rougish';
-final StringBuffer termBuffer = StringBuffer();
 final List<Screen> screenStack = [];
 final Screen test = Screen.test();
 final Screen command = Screen.command();
@@ -17,6 +16,7 @@ final Screen title = Screen.title();
 final Screen setup = Screen.setup();
 final Screen level = Screen.level();
 final Screen debrief = Screen.debrief();
+final StringBuffer screenBuffer = title.screenBuffer;
 late final StreamSubscription<List<int>> termListener;
 late final GameData state;
 late Screen currentScreen;
@@ -25,44 +25,54 @@ bool paused = false;
 bool commandBarOpen = false;
 
 void pushScreen(Screen screen) {
-  if (screenStack.length > 0) {
+  if (screenStack.isNotEmpty) {
     screenListener.cancel();
   }
   screenStack.add(screen);
   currentScreen = screenStack.last;
   Log.info(logLabel, 'pushScreen() added ${screen.runtimeType} as new current screen');
   screenListener = currentScreen.listen(onScreenEvent);
-  // push is additive; can get away with only drawing new screen
-  currentScreen.draw(state);
+  redrawScreens();
 }
 
 Screen popScreen() {
-  if (screenStack.length == 0) {
+  if (screenStack.isEmpty) {
     throw Exception('popScreen() called when screenStack was empty.');
   }
   screenListener.cancel();
   Screen screen = screenStack.removeLast();
-  if (screenStack.length > 0) {
+  if (screenStack.isNotEmpty) {
     currentScreen = screenStack.last;
     screenListener = currentScreen.listen(onScreenEvent);
     Log.info(logLabel,
         'popScreen() removed ${screen.runtimeType}; current screen is ${currentScreen.runtimeType}');
-    // pop is subtractive, need to redraw full stack
     redrawScreens();
   }
   return screen;
 }
 
+void popAllScreens() {
+  if (screenStack.isEmpty) {
+    throw Exception('popAllScreens() called when screenStack was empty.');
+  }
+  screenListener.cancel();
+  while (screenStack.isNotEmpty) {
+    screenStack.removeLast();
+  }
+}
+
 void redrawScreens() {
   Log.debug(logLabel, 'redrawScreens() redrawing ${screenStack.length} screens from bottom up..');
+  term.clear(screenBuffer, hideCursor: true, clearHistory: true);
   // dart lists iterate from first added to last added, which gives us bottom to top of stack
   for (final screen in screenStack) {
     screen.draw(state);
   }
+  term.printBuffer(screenBuffer);
 }
 
 void showCodes(List<int> codes) {
-  term.placeMessageRelative(termBuffer, '${term.codesToString(codes)}', yPercent: 100);
+  Log.debug(logLabel, () => term.codesToString(codes));
 }
 
 void onResize() {
@@ -124,11 +134,17 @@ void onDebrief() {
   pushScreen(debrief); // add debrief
 }
 
+void onTitle() {
+  Log.info(logLabel, 'onTitle() returning to title..');
+  popAllScreens(); // reset
+  pushScreen(title); // add title
+}
+
 void onQuit() {
   Log.info(logLabel, 'onQuit() quitting..');
   screenListener.cancel();
   termListener.cancel();
-  term.clear(termBuffer, hideCursor: true, clearHistory: true);
+  term.clear(screenBuffer, hideCursor: true, clearHistory: true);
   term.print('thank you for playing.\n');
   term.showCursor();
   exit(0);
@@ -137,10 +153,14 @@ void onQuit() {
 void onKeySequence(List<int> seq, String hash) {
   Log.debug(logLabel, 'onKeySequence() ${hash}');
   currentScreen.onKeySequence(seq, hash, state);
+  redrawScreens();
 }
 
 void onScreenEvent(ScreenEvent event) {
   Log.debug(logLabel, 'onScreenEvent() ${event.name}');
+  if (commandBarOpen && event != ScreenEvent.hideCommandBar) {
+    onHideCommandBar();
+  }
   switch (event) {
     case ScreenEvent.quit:
       onQuit();
@@ -160,8 +180,11 @@ void onScreenEvent(ScreenEvent event) {
     case ScreenEvent.debrief:
       onDebrief();
       break;
+    case ScreenEvent.title:
+      onTitle();
+      break;
     default:
-      term.centerMessage(termBuffer, 'screen event: ${event}; (no action)', yOffset: -6);
+      Log.warn(logLabel, 'screen event: ${event}; (no action)');
   }
 }
 
@@ -177,7 +200,6 @@ void onData(List<int> codes) {
   }
 
   showCodes(codes);
-
   String codeHash = term.codeHash(codes);
 
   if (!commandBarOpen && config.isCommandBar(codeHash)) {
@@ -216,8 +238,6 @@ void main(List<String> arguments) {
 
   config.setKeys(state.conf);
 
-  term.clear(termBuffer, hideCursor: true, clearHistory: true);
-
   runZonedGuarded(() {
     termListener = term.listen(onData, onError);
     addSignalListeners();
@@ -225,7 +245,7 @@ void main(List<String> arguments) {
     Log.warn(logLabel, 'listener zone exception: ${e}');
   });
 
+  //pushScreen(test);
   pushScreen(title);
-  pushScreen(test);
-  //pushScreen(title);
+  redrawScreens();
 }

@@ -298,6 +298,7 @@ void showCursor() {
 /// The provided stringbuffer is cleared and filled with ANSI codes to reset styles,
 /// clear the screen, and position the cursor in the top left corner.
 /// Optionally, scrollback history can be cleared, and the cursor can be hidden.
+/// The provided stringbuffer is left empty.
 void clear(StringBuffer sb, {hideCursor = false, clearHistory = false}) {
   sb.clear();
   ansi.reset(sb);
@@ -311,28 +312,28 @@ void clear(StringBuffer sb, {hideCursor = false, clearHistory = false}) {
     sb.write(ansi.hide);
   }
   printBuffer(sb);
+  sb.clear();
 }
 
-/// Print the provided message at specific coordinates of the screen.
+/// Add ANSI codes to the provided string buffer to print a message at specific coordinates of the screen.
+/// The provided stringbuffer is concatened to (not cleared). The buffer is not sent to stderr in this method (see [printBuffer]).
 ///
-/// The provided stringbuffer is cleared and used to assemble the string to print.
 /// [xPos] sets the horizontal position of the message.
 /// [yPos] sets the vertical position of the message.
 /// [cll] if `true`, clears the row before printing.
 void placeMessage(StringBuffer sb, String msg, {int xPos = 0, int yPos = 0, bool cll = false}) {
-  sb.clear();
+  //sb.clear();
   ansi.xy(sb, xPos, yPos);
   if (cll) {
     ansi.cll(sb);
   }
   sb.write(msg);
   ansi.reset(sb);
-  printBuffer(sb);
 }
 
-/// Print the provided message at relative coordinates of the screen.
+/// Add ANSI codes to the provided string buffer to print the provided message at relative coordinates of the screen.
 ///
-/// The provided stringbuffer is cleared and used to assemble the string to print.
+/// The provided stringbuffer is concatened to (not cleared).
 /// [xPercent] sets the horizontal position of the message. `0` maps to the first column (left-most), `100` to the last (right-most).
 /// [yPercent] sets the vertical position of the message. `0` maps to the first row (top), `100` maps to the last row (bottom).
 /// [xOffset] adjusts the horizontal position of the message (in absolute columns, not percent).
@@ -346,9 +347,9 @@ void placeMessageRelative(StringBuffer sb, String msg,
   placeMessage(sb, msg, xPos: x, yPos: y, cll: cll);
 }
 
-/// Print the provided message in the middle of the screen.
+/// Add ANSI codes to the provided string buffer to print the provided message in the middle of the screen.
 ///
-/// The provided stringbuffer is cleared and used to assemble the string to print.
+/// The provided stringbuffer is concatened to (not cleared).
 /// [xOffset] adjusts the horizontal position of the message.
 /// [yOffset] adjusts the vertical position of the message.
 /// [msgOffset] adjusts the calculated length of the message before centering.

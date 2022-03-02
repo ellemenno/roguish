@@ -32,7 +32,6 @@ class PauseScreen extends Screen {
 
   void _dialog(StringBuffer sb) {
     String lh;
-    sb.clear();
     term.centerMessage(sb, ' .${_dlg[0]}. ', yOffset: -3);
     term.centerMessage(sb, ' |${_dlg[1]}| ', yOffset: -2);
     term.centerMessage(sb, ' |${_dlg[2]}| ', yOffset: -1);
@@ -71,7 +70,6 @@ class PauseScreen extends Screen {
       _curOption = 0;
       broadcast(todo);
     }
-    else if (redrawNeeded) { draw(state); }
   }
 
   @override

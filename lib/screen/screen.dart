@@ -18,11 +18,13 @@ enum ScreenEvent {
   titleToSetup,
   setupToLevel,
   debrief,
+  title,
 }
 
 abstract class Screen {
   static final StringBuffer _sb = StringBuffer();
 
+  // FIXME: make this a static getter?
   final StringBuffer _tmp;
   StringBuffer get screenBuffer => _tmp;
 

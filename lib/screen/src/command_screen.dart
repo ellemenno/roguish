@@ -18,9 +18,12 @@ class CommandScreen extends Screen {
 
     switch (parts.first) {
       case 'quit':
+      case 'exit':
         return ScreenEvent.quit;
       case 'debrief':
         return ScreenEvent.debrief;
+      case 'title':
+        return ScreenEvent.title;
     }
     return ScreenEvent.nothing;
   }
@@ -51,11 +54,6 @@ class CommandScreen extends Screen {
     // process printables after control keys
     else if (term.isPrintableAscii(seq)) {
       _input.write(seq[0]);
-    }
-
-    if (_input.modified) {
-      _input.resetModified();
-      draw(state);
     }
 
     if (todo != ScreenEvent.nothing) {
