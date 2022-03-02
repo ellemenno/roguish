@@ -24,9 +24,7 @@ enum ScreenEvent {
 abstract class Screen {
   static final StringBuffer _sb = StringBuffer();
 
-  // FIXME: make this a static getter?
-  final StringBuffer _tmp;
-  StringBuffer get screenBuffer => _tmp;
+  StringBuffer get screenBuffer => _sb; // all screens share/reuse the same temp string buffer
 
   final StreamController<ScreenEvent> _eventBroadcaster = StreamController<ScreenEvent>.broadcast();
 
@@ -41,7 +39,7 @@ abstract class Screen {
   void onKeySequence(List<int> seq, String hash, GameData state);
   void draw(GameData state);
 
-  Screen() : _tmp = _sb; // all screens share/reuse the same temp string buffer
+  Screen();
 
   factory Screen.test() {
     return TestScreen();
