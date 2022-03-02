@@ -8,6 +8,7 @@ import 'src/level_screen.dart';
 import 'src/pause_screen.dart';
 import 'src/setup_screen.dart';
 import 'src/title_screen.dart';
+import 'src/test_screen.dart';
 
 enum ScreenEvent {
   nothing,
@@ -40,7 +41,9 @@ abstract class Screen {
 
   Screen() : _tmp = _sb; // all screens share/reuse the same temp string buffer
 
-
+  factory Screen.test() {
+    return TestScreen();
+  }
   factory Screen.command() {
     return CommandScreen();
   }

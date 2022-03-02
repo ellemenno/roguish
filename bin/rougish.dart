@@ -10,6 +10,7 @@ import 'package:rougish/screen/screen.dart';
 const logLabel = 'rougish';
 final StringBuffer termBuffer = StringBuffer();
 final List<Screen> screenStack = [];
+final Screen test = Screen.test();
 final Screen command = Screen.command();
 final Screen pause = Screen.pause();
 final Screen title = Screen.title();
@@ -225,4 +226,6 @@ void main(List<String> arguments) {
   });
 
   pushScreen(title);
+  pushScreen(test);
+  //pushScreen(title);
 }
