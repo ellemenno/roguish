@@ -4,6 +4,8 @@ class GameData {
   late final Map<String, String> _conf;
   Map<String, String> get conf => _conf;
 
+  final List<Creature> players = [];
+
   final List<List<Cell>> levelMap = [];
   int level = 1;
   int experience = 0;

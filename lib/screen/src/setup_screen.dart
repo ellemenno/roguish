@@ -1,4 +1,5 @@
 import 'package:rougish/game/game_data.dart';
+import 'package:rougish/game/map.dart';
 import 'package:rougish/log/log.dart';
 import 'package:rougish/term/ansi.dart' as ansi;
 import 'package:rougish/term/terminal.dart' as term;
@@ -11,6 +12,7 @@ class SetupScreen extends Screen {
   void onKeySequence(List<int> seq, String hash, GameData state) {
     if (term.isEnter(seq)) {
       Log.info(logLabel, 'Enter key detected. advancing to level 1..');
+      state.players.add(Creature(CreatureType.humanPlayer));
       broadcast(ScreenEvent.setupToLevel);
     }
   }

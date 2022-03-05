@@ -1,260 +1,16 @@
-enum UIType {
-  level,
-  health,
-  strength,
-  runes,
-  herbs,
-  coins,
-}
 
-enum CellType {
-  unexplored,
-  tunnelDim,
-  tunnelBright,
-  wallDim,
-  wallBright,
-  doorH,
-  doorV,
-  floor,
-  fireWall,
-  fireWallSmall,
-  iceWall,
-  iceWallSmall,
-  exit,
-}
+import 'package:rougish/game/game_data.dart';
 
-enum CreatureType {
-  none,
-  humanPlayer,
-  humanNPC,
-  slimeLarge,
-  slimeMedium,
-  slime,
-  bat,
-  spiderLarge,
-  spider,
-  cobraLarge,
-  cobra,
-  scorpionLarge,
-  scorpion,
-  dragon,
-  skeleton,
-}
+import 'src/map_types.dart';
+import 'src/map_symbols.dart';
 
-enum ItemType {
-  none,
-  // health
-  pestle,
-  herbYoung,
-  herbFresh,
-  herbDried,
-  potion,
-  food,
-  // strength
-  mace,
-  sword,
-  arrow,
-  bow,
-  shield,
-  // magic
-  staff,
-  rune,
-  flame,
-  fireball,
-  iceball,
-  // treasure
-  grave,
-  gold,
-  ruby,
-  pearl,
-  diamond,
-  ring,
-  bracelet,
-}
+export 'src/map_types.dart';
+export 'src/map_symbols.dart';
 
-enum ItemCategory {
-  none,
-  health,
-  strength,
-  magic,
-  treasure,
-}
-
-const Map<ItemCategory, List<ItemType>> itemCatalog = {
-  ItemCategory.health: [
-    ItemType.pestle,
-    ItemType.herbYoung,
-    ItemType.herbFresh,
-    ItemType.herbDried,
-    ItemType.potion,
-    ItemType.food,
-  ],
-  ItemCategory.strength: [
-    ItemType.mace,
-    ItemType.sword,
-    ItemType.arrow,
-    ItemType.bow,
-    ItemType.shield,
-  ],
-  ItemCategory.magic: [
-    ItemType.staff,
-    ItemType.rune,
-    ItemType.flame,
-    ItemType.fireball,
-    ItemType.iceball,
-  ],
-  ItemCategory.treasure: [
-    ItemType.grave,
-    ItemType.gold,
-    ItemType.ruby,
-    ItemType.pearl,
-    ItemType.diamond,
-    ItemType.ring,
-    ItemType.bracelet,
-  ],
-};
-
-String uiSymbol(UIType type) {
-  switch (type) {
-    case UIType.level:
-      return '\u2261'; //           ≡ 2261
-    case UIType.health:
-      return '\u2665'; //           ♥ 2665
-    case UIType.strength:
-      return '\u002B'; //           + 002B
-    case UIType.runes:
-      return '\u16B9'; //           ᚹ 16B9
-    case UIType.herbs:
-      return '\u2698'; //           ⚘ 2698
-    case UIType.coins:
-      return '\u0024'; //           $ 0024
-  }
-}
-
-String cellSymbol(CellType type) {
-  switch (type) {
-    case CellType.unexplored:
-      return '\u0020'; //             0020 (space)
-    case CellType.tunnelDim:
-      return '\u2591'; //           ░ 2591
-    case CellType.tunnelBright:
-      return '\u2592'; //           ▒ 2592
-    case CellType.wallDim:
-      return '\u2593'; //           ▓ 2593
-    case CellType.wallBright:
-      return '\u2588'; //           █ 2588
-    case CellType.doorH:
-      return '\u2501'; //           ━ 2501
-    case CellType.doorV:
-      return '\u2503'; //           ┃ 2503
-    case CellType.floor:
-      return '\u002e'; //           . 002e
-    case CellType.fireWall:
-      return '\u25A0'; //           ■ 25A0
-    case CellType.fireWallSmall:
-      return '\u25AA'; //           ▪ 25AA
-    case CellType.iceWall:
-      return '\u25A1'; //           □ 25A1
-    case CellType.iceWallSmall:
-      return '\u25AB'; //           ▫ 25AB
-    case CellType.exit:
-      return '\u2261'; //           ≡ 2261
-  }
-}
-
-String creatureSymbol(CreatureType type) {
-  switch (type) {
-    case CreatureType.humanPlayer:
-      return '\u263B'; //           ☻ 263B
-    case CreatureType.humanNPC:
-      return '\u263A'; //           ☺ 263A
-    case CreatureType.slimeLarge:
-      return '\u1E4F'; //           ṏ 1E4F
-    case CreatureType.slimeMedium:
-      return '\u00D6'; //           ö 00D6
-    case CreatureType.slime:
-      return '\u00B0'; //           ° 00B0
-    case CreatureType.bat:
-      return '\u0264'; //           ɤ 0264
-    case CreatureType.spiderLarge:
-      return '\u0466'; //           Ѧ 0466
-    case CreatureType.spider:
-      return '\u0467'; //           ѧ 0467
-    case CreatureType.cobraLarge:
-      return '\u0291'; //           ʑ 0291
-    case CreatureType.cobra:
-      return '\u1dbd'; //           ᶽ 1dbd
-    case CreatureType.scorpionLarge:
-      return '\u0255'; //           ɕ 0255
-    case CreatureType.scorpion:
-      return '\u1d9d'; //           ᶝ 1d9d
-    case CreatureType.dragon:
-      return '\u1E9F'; //           ẟ 1E9F
-    case CreatureType.skeleton:
-      return '\u02AD'; //           ʭ 02AD
-    default:
-      return 'X';
-  }
-}
-
-String itemSymbol(ItemType type) {
-  switch (type) {
-    // health
-    case ItemType.pestle:
-      return '\u26B2'; //           ⚲ 26B2
-    case ItemType.herbYoung:
-      return '\u27df'; //           ⟟ 27df
-    case ItemType.herbFresh:
-      return '\u2698'; //           ⚘ 2698
-    case ItemType.herbDried:
-      return '\u26B5'; //           ⚵ 26B5
-    case ItemType.potion:
-      return '\u2641'; //           ♁ 2641
-    case ItemType.food:
-      return '\u0023'; //           # 0023
-    // strength
-    case ItemType.mace:
-      return '\u26B4'; //           ⚴ 26B4
-    case ItemType.sword:
-      return '\u26B8'; //           ⚸ 26B8
-    case ItemType.arrow:
-      return '\u{10323}'; //        𐌣 10323
-    case ItemType.bow:
-      return '\u0028'; //           ( 0028
-    case ItemType.shield:
-      return '\u005B'; //           [ 005B
-    // magic
-    case ItemType.staff:
-      return '\u0021'; //           ! 0021
-    case ItemType.rune:
-      return '\u16B9'; //           ᚹ 16B9
-    case ItemType.flame:
-      return '\u1EFC'; //           Ỽ 1EFC
-    case ItemType.fireball:
-      return '\u25CF'; //           ● 25CF
-    case ItemType.iceball:
-      return '\u25CB'; //           ○ 25CB
-    // treasure
-    case ItemType.grave:
-      return '\u2020'; //           † 2020
-    case ItemType.gold:
-      return '\u24FF'; //           ⓿ 24FF
-    case ItemType.ruby:
-      return '\u2666'; //           ♦ 2666
-    case ItemType.pearl:
-      return '\u2022'; //           • 2022
-    case ItemType.diamond:
-      return '\u22C4'; //           ⋄ 22C4
-    case ItemType.ring:
-      return '\u2641'; //           ♁ 2641
-    case ItemType.bracelet:
-      return '\u25CC'; //           ◌ 25CC
-    default:
-      return 'X';
-  }
-}
 
 class Item {
+  static final Item noItem = Item.none();
+
   final ItemCategory category;
   final ItemType type;
 
@@ -266,7 +22,17 @@ class Item {
 }
 
 class Creature {
+  static final Creature noCreature = Creature.none();
+
   final CreatureType type;
+
+  int col = -1;
+  int row = -1;
+  int health = 0;
+  int strength = 0;
+  int runes = 0;
+  int herbs = 0;
+  int coins = 0;
 
   Creature(this.type);
 
@@ -277,8 +43,8 @@ class Cell {
   final int col;
   final int row;
 
-  Creature occupant = Creature.none();
-  Item contents = Item.none();
+  Creature occupant = Creature.noCreature;
+  Item contents = Item.noItem;
   CellType type = CellType.unexplored;
 
   @override
@@ -295,7 +61,8 @@ class Cell {
   Cell(this.col, this.row);
 }
 
-class MapMaker {
+class LevelGenerator {
+
   static void _fill(List<List<Cell>> map, int cols, int rows) {
     map.clear();
     for (int r = 0; r < rows; r++) {
@@ -307,13 +74,83 @@ class MapMaker {
     }
   }
 
-  static void generate(List<List<Cell>> map, {cols = 80, rows = 24}) {
+  static void generate(GameData gameData, {cols = 80, rows = 24}) {
+    List<List<Cell>> map = gameData.levelMap;
     _fill(map, cols, rows);
+
     // eventually, smart stuff to populate the cells..
     map.first.first.type = CellType.tunnelDim;
     map.first.last.type = CellType.tunnelBright;
     map.last.first.type = CellType.wallBright;
     map.last.last.type = CellType.wallDim;
+
+    int mc = (cols / 2).floor();
+    int mr = (rows / 2).floor();
+
+    int i = 0;
+    for (Creature player in gameData.players) {
+      LevelManager.spawn(map, player, mc+i, mr);
+      i++;
+    }
+  }
+
+}
+
+class LevelManager {
+
+  static bool _isUnoccupied(Cell cell) {
+    return (cell.occupant.type == CreatureType.none);
+  }
+
+  static bool _isTraversable(Cell cell) {
+    switch (cell.type) {
+      case CellType.unexplored: return true; // but if we occupy the cell, it's no longer unexplored..
+      case CellType.tunnelDim: return true;
+      case CellType.tunnelBright: return true;
+      case CellType.wallDim: return false;
+      case CellType.wallBright: return false;
+      case CellType.doorH: return true;
+      case CellType.doorV: return true;
+      case CellType.floor: return true;
+      case CellType.fireWall: return false;
+      case CellType.fireWallSmall: return false;
+      case CellType.iceWall: return false;
+      case CellType.iceWallSmall: return false;
+      case CellType.exit: return true;
+    }
+  }
+
+  static void spawn(List<List<Cell>> map, Creature c, int col, int row) {
+    map[row][col].occupant = c;
+    c.col = col;
+    c.row = row;
+  }
+
+  static void towards(List<List<Cell>> map, Creature c, int dc, int dr) {
+    int oldCol = c.col;
+    int oldRow = c.row;
+    int newCol = oldCol + dc;
+    int newRow = oldRow + dr;
+    Cell targetCell = map[newRow][newCol];
+
+    if (_isTraversable(targetCell)) {
+      if (_isUnoccupied(targetCell)) {
+        move(map, c, newCol, newRow);
+      }
+      else {
+        // TODO: initiate interaction, e.g. attack
+      }
+    }
+  }
+
+  static void move(List<List<Cell>> map, Creature c, int newCol, int newRow) {
+    int oldCol = c.col;
+    int oldRow = c.row;
+    map[oldRow][oldCol].occupant = Creature.noCreature;
+    map[newRow][newCol].occupant = c;
+    // TODO: acquire items
+    c.col = newCol;
+    c.row = newRow;
   }
 
   static void render(StringBuffer screenBuffer, List<List<Cell>> map) {
@@ -323,7 +160,7 @@ class MapMaker {
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < cols; c++) {
         cell = map[r][c];
-        screenBuffer.write(cellSymbol(cell.type));
+        screenBuffer.write(cell.toString());
       }
       if (r + 1 < rows) {
         screenBuffer.write('\n');
