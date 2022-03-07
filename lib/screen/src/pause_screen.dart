@@ -49,16 +49,13 @@ class PauseScreen extends Screen {
   void onKeySequence(List<int> seq, String hash, GameData state) {
     Log.debug(logLabel, 'onKeySequence: ${hash}');
     ScreenEvent todo = ScreenEvent.nothing;
-    bool redrawNeeded = false;
 
     if (config.isPause(hash)) {
       todo = options[0];
     } else if (config.isUp(hash)) {
       _curOption = _wrap(_curOption, -1, numOptions);
-      redrawNeeded = true;
     } else if (config.isDown(hash)) {
       _curOption = _wrap(_curOption, 1, numOptions);
-      redrawNeeded = true;
     } else if (term.isEnter(seq)) {
       todo = options[_curOption];
     }

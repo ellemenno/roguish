@@ -33,13 +33,13 @@ class LevelScreen extends Screen {
   void onKeySequence(List<int> seq, String hash, GameData state) {
     if (config.isUp(hash)) {
       // player towards N
-      map.LevelManager.towards(state.levelMap, state.players.first,  0, -1);
+      map.LevelManager.towards(state.levelMap, state.players.first, 0, -1);
     } else if (config.isRight(hash)) {
       // player towards E
-      map.LevelManager.towards(state.levelMap, state.players.first,  1,  0);
+      map.LevelManager.towards(state.levelMap, state.players.first, 1, 0);
     } else if (config.isDown(hash)) {
       // player towards S
-      map.LevelManager.towards(state.levelMap, state.players.first,  0,  1);
+      map.LevelManager.towards(state.levelMap, state.players.first, 0, 1);
     } else if (config.isLeft(hash)) {
       // player towards W
       map.LevelManager.towards(state.levelMap, state.players.first, -1, 0);
@@ -51,7 +51,7 @@ class LevelScreen extends Screen {
     if (state.levelMap.isEmpty) {
       List<int> dim = term.size();
       // leave a row at the top and bottom for the ui
-      map.LevelGenerator.generate(state, cols: dim[0], rows: dim[1] - 2);
+      map.LevelGenerator.generate(state.levelMap, state.players, cols: dim[0], rows: dim[1] - 2);
       Log.debug(logLabel, '${state.levelMap}');
     }
     _drawMap(screenBuffer, state);
