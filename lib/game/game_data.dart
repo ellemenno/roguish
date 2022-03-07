@@ -1,4 +1,5 @@
-import 'package:rougish/game/map.dart';
+import 'src/cell.dart';
+import 'src/creature.dart';
 
 class GameData {
   late final Map<String, String> _conf;

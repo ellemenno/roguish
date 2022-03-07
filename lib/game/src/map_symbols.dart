@@ -7,9 +7,9 @@ String uiSymbol(UIType type) {
     case UIType.health:
       return '\u2665'; //           ♥ 2665
     case UIType.strength:
-      return '\u002B'; //           + 002B
+      return '\u002b'; //           + 002B
     case UIType.runes:
-      return '\u16B9'; //           ᚹ 16B9
+      return '\u16b9'; //           ᚹ 16B9
     case UIType.herbs:
       return '\u2698'; //           ⚘ 2698
     case UIType.coins:
@@ -34,15 +34,15 @@ String cellSymbol(CellType type) {
     case CellType.doorV:
       return '\u2503'; //           ┃ 2503
     case CellType.floor:
-      return '\u002e'; //           . 002e
+      return '\u00b7'; //           · 00B7
     case CellType.fireWall:
-      return '\u25A0'; //           ■ 25A0
+      return '\u25a0'; //           ■ 25A0
     case CellType.fireWallSmall:
-      return '\u25AA'; //           ▪ 25AA
+      return '\u25aa'; //           ▪ 25AA
     case CellType.iceWall:
-      return '\u25A1'; //           □ 25A1
+      return '\u25a1'; //           □ 25A1
     case CellType.iceWallSmall:
-      return '\u25AB'; //           ▫ 25AB
+      return '\u25ab'; //           ▫ 25AB
     case CellType.exit:
       return '\u2261'; //           ≡ 2261
   }
@@ -51,15 +51,15 @@ String cellSymbol(CellType type) {
 String creatureSymbol(CreatureType type) {
   switch (type) {
     case CreatureType.humanPlayer:
-      return '\u263B'; //           ☻ 263B
+      return '\u263b'; //           ☻ 263B
     case CreatureType.humanNPC:
-      return '\u263A'; //           ☺ 263A
+      return '\u263a'; //           ☺ 263A
     case CreatureType.slimeLarge:
-      return '\u1E4F'; //           ṏ 1E4F
+      return '\u1e4f'; //           ṏ 1E4F
     case CreatureType.slimeMedium:
-      return '\u00D6'; //           ö 00D6
+      return '\u00d6'; //           ö 00D6
     case CreatureType.slime:
-      return '\u00B0'; //           ° 00B0
+      return '\u00b0'; //           ° 00B0
     case CreatureType.bat:
       return '\u0264'; //           ɤ 0264
     case CreatureType.spiderLarge:
@@ -75,9 +75,9 @@ String creatureSymbol(CreatureType type) {
     case CreatureType.scorpion:
       return '\u1d9d'; //           ᶝ 1d9d
     case CreatureType.dragon:
-      return '\u1E9F'; //           ẟ 1E9F
+      return '\u1e9f'; //           ẟ 1E9F
     case CreatureType.skeleton:
-      return '\u02AD'; //           ʭ 02AD
+      return '\u02ad'; //           ʭ 02AD
     default:
       return 'X';
   }
@@ -87,54 +87,54 @@ String itemSymbol(ItemType type) {
   switch (type) {
     // health
     case ItemType.pestle:
-      return '\u26B2'; //           ⚲ 26B2
+      return '\u26b2'; //           ⚲ 26B2
     case ItemType.herbYoung:
       return '\u27df'; //           ⟟ 27df
     case ItemType.herbFresh:
       return '\u2698'; //           ⚘ 2698
     case ItemType.herbDried:
-      return '\u26B5'; //           ⚵ 26B5
+      return '\u26b5'; //           ⚵ 26B5
     case ItemType.potion:
       return '\u2641'; //           ♁ 2641
     case ItemType.food:
       return '\u0023'; //           # 0023
     // strength
     case ItemType.mace:
-      return '\u26B4'; //           ⚴ 26B4
+      return '\u26b4'; //           ⚴ 26B4
     case ItemType.sword:
-      return '\u26B8'; //           ⚸ 26B8
+      return '\u26b8'; //           ⚸ 26B8
     case ItemType.arrow:
       return '\u{10323}'; //        𐌣 10323
     case ItemType.bow:
       return '\u0028'; //           ( 0028
     case ItemType.shield:
-      return '\u005B'; //           [ 005B
+      return '\u005b'; //           [ 005B
     // magic
     case ItemType.staff:
       return '\u0021'; //           ! 0021
     case ItemType.rune:
-      return '\u16B9'; //           ᚹ 16B9
+      return '\u16b9'; //           ᚹ 16B9
     case ItemType.flame:
-      return '\u1EFC'; //           Ỽ 1EFC
+      return '\u1efc'; //           Ỽ 1EFC
     case ItemType.fireball:
-      return '\u25CF'; //           ● 25CF
+      return '\u25cf'; //           ● 25CF
     case ItemType.iceball:
-      return '\u25CB'; //           ○ 25CB
+      return '\u25cb'; //           ○ 25CB
     // treasure
     case ItemType.grave:
       return '\u2020'; //           † 2020
     case ItemType.gold:
-      return '\u24FF'; //           ⓿ 24FF
+      return '\u24ff'; //           ⓿ 24FF
     case ItemType.ruby:
       return '\u2666'; //           ♦ 2666
     case ItemType.pearl:
       return '\u2022'; //           • 2022
     case ItemType.diamond:
-      return '\u22C4'; //           ⋄ 22C4
+      return '\u22c4'; //           ⋄ 22C4
     case ItemType.ring:
       return '\u2641'; //           ♁ 2641
     case ItemType.bracelet:
-      return '\u25CC'; //           ◌ 25CC
+      return '\u25cc'; //           ◌ 25CC
     default:
       return 'X';
   }
