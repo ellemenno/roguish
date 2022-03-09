@@ -36,7 +36,11 @@ List<int> toCodes(Map<String, String> conf, String key, String alt) {
 }
 
 LogLevel logLevel(Map<String, String> conf, {defaultLevel = LogLevel.none}) {
-  return toLogLevel(conf['log_level'] ?? defaultLevel);
+  return toLogLevel(conf['log_level'] ?? defaultLevel.name);
+}
+
+int prngSeed(Map<String, String> conf) {
+  return int.parse(conf['prng_seed'] ?? '${DateTime.now().microsecond}');
 }
 
 List<int> keyCommandBar(Map<String, String> conf, {defaultCodes = '0x20'}) {

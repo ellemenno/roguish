@@ -8,6 +8,8 @@ class Rectangle {
 
   int get width => right - left;
   int get height => bottom - top;
+  int get midX => left + (width ~/ 2);
+  int get midY => top + (height ~/ 2);
 
   @override
   String toString() {
@@ -65,21 +67,21 @@ class Rectangle {
         math.max(r1.right, r2.right), math.max(r1.bottom, r2.bottom));
   }
 
-  static Rectangle splitH(Rectangle r1, int distance) {
+  static Rectangle splitH(Rectangle r1, int distance, {int halfGap = 1}) {
     if (distance >= r1.width) {
       throw Exception('rectangle of width ${r1.width} can not be split at ${distance}');
     }
-    Rectangle r2 = Rectangle(r1.right - distance, r1.top, r1.right, r1.bottom);
-    r1.right -= distance;
+    Rectangle r2 = Rectangle(r1.right - distance + halfGap, r1.top, r1.right, r1.bottom);
+    r1.right = r2.left - halfGap;
     return r2;
   }
 
-  static Rectangle splitV(Rectangle r1, int distance) {
+  static Rectangle splitV(Rectangle r1, int distance, {int halfGap = 1}) {
     if (distance >= r1.height) {
       throw Exception('rectangle of height ${r1.height} can not be split at ${distance}');
     }
-    Rectangle r2 = Rectangle(r1.left, r1.top + distance, r1.right, r1.bottom);
-    r1.bottom -= distance;
+    Rectangle r2 = Rectangle(r1.left, r1.bottom - distance + halfGap, r1.right, r1.bottom);
+    r1.bottom = r2.top - halfGap;
     return r2;
   }
 

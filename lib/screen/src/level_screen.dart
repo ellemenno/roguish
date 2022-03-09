@@ -51,8 +51,9 @@ class LevelScreen extends Screen {
     if (state.levelMap.isEmpty) {
       List<int> dim = term.size();
       // leave a row at the top and bottom for the ui
-      map.LevelGenerator.generate(state.levelMap, state.players, cols: dim[0], rows: dim[1] - 2);
-      Log.debug(logLabel, '${state.levelMap}');
+      Log.debug(logLabel, 'draw() new map - rows: ${dim[1] - 2}, cols: ${dim[0]}');
+      map.LevelGenerator.generate(state.levelMap, state.players, state.prng,
+          cols: dim[0], rows: dim[1] - 2);
     }
     _drawMap(screenBuffer, state);
     _drawUI(screenBuffer, state);

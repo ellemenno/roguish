@@ -12,13 +12,14 @@ import 'src/test_screen.dart';
 
 enum ScreenEvent {
   nothing,
-  quit,
-  resume,
-  hideCommandBar,
-  titleToSetup,
-  setupToLevel,
   debrief,
+  hideCommandBar,
+  quit,
+  regen,
+  resume,
+  setupToLevel,
   title,
+  titleToSetup,
 }
 
 abstract class Screen {

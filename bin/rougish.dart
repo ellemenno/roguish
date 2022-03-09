@@ -140,6 +140,15 @@ void onTitle() {
   pushScreen(title); // add title
 }
 
+void onLevelRegen() {
+  if (currentScreen != level) {
+    Log.warn(logLabel, 'onLevelRegen() not currently on the level screen; ignoring command');
+  }
+  Log.info(logLabel, 'onLevelRegen() clearing and regenerating level..');
+  state.levelMap.clear();
+  redrawScreens();
+}
+
 void onQuit() {
   Log.info(logLabel, 'onQuit() quitting..');
   screenListener.cancel();
@@ -182,6 +191,9 @@ void onScreenEvent(ScreenEvent event) {
       break;
     case ScreenEvent.title:
       onTitle();
+      break;
+    case ScreenEvent.regen:
+      onLevelRegen();
       break;
     default:
       Log.warn(logLabel, 'screen event: ${event}; (no action)');
@@ -229,7 +241,8 @@ void addSignalListeners() {
 }
 
 void main(List<String> arguments) {
-  state = GameData(config.fromFile('bin/rougish.conf'));
+  Map<String, String> conf = config.fromFile('bin/rougish.conf');
+  state = GameData(conf, seed: config.prngSeed(conf));
 
   Log.toFile();
   Log.level = config.logLevel(state.conf);

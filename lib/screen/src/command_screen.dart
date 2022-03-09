@@ -22,6 +22,8 @@ class CommandScreen extends Screen {
         return ScreenEvent.quit;
       case 'debrief':
         return ScreenEvent.debrief;
+      case 'regen':
+        return ScreenEvent.regen;
       case 'title':
         return ScreenEvent.title;
     }

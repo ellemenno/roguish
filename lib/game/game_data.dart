@@ -1,7 +1,10 @@
+import 'dart:math';
+
 import 'src/cell.dart';
 import 'src/creature.dart';
 
 class GameData {
+  final Random prng;
   late final Map<String, String> _conf;
   Map<String, String> get conf => _conf;
 
@@ -16,5 +19,5 @@ class GameData {
   int herbs = 0;
   int coins = 0;
 
-  GameData(this._conf);
+  GameData(this._conf, {int seed = 1234}) : prng = Random(seed);
 }
