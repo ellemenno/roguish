@@ -60,8 +60,6 @@ class PauseScreen extends Screen {
       todo = options[_curOption];
     }
 
-    term.centerMessage(screenBuffer, 'key hash: ${hash}  curOption: ${_curOption}', yOffset: 6);
-
     if (todo != ScreenEvent.nothing) {
       term.centerMessage(screenBuffer, 'todo: \'${todo}\'', yOffset: 5);
       _curOption = 0;
