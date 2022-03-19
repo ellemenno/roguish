@@ -12,6 +12,28 @@ void usage() {
   log('grind ${context.grinder.tasks}');
 }
 
+@Task('lists TODOs')
+void todo() {
+  const token = 'TODO';
+  if (Platform.isWindows) {
+    run('findstr', arguments: ['/s', '/n', '\\/\\/${token}:', '*.dart']);
+  }
+  else {
+    run('grep', arguments: ['//${token}:', '--recursive', '--line-number', '--include', '\*.dart']);
+  }
+}
+
+@Task('lists FIXMEs')
+void fixme() {
+  const token = 'FIXME';
+  if (Platform.isWindows) {
+    run('findstr', arguments: ['/s', '/n', '\\/\\/${token}:', '*.dart']);
+  }
+  else {
+    run('grep', arguments: ['//${token}:', '--recursive', '--line-number', '--include', '\*.dart']);
+  }
+}
+
 @Task('formats code')
 void format() {
   // DartFmt.format(existingSourceDirs, lineLength: 100);
