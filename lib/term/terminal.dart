@@ -181,6 +181,9 @@ SeqKey seqKeyFromCodeHash(String hash) {
 }
 
 /// Match a given code sequence to a [SeqKey] enumeration, including [SeqKey.none] if no match.
+///
+/// _Note:_ as of Dart 2.16.0, Windows does not recognize `ESC` or any key sequences that start with `ESC`.
+/// See https://github.com/dart-lang/sdk/issues/48329
 SeqKey seqKeyFromCodes(List<int> codes) {
   int n = codes.length;
   if (n < 3) {
