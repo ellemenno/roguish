@@ -6,7 +6,7 @@ import 'package:rougish/term/terminal.dart' as term;
 import '../screen.dart';
 
 class PauseScreen extends Screen {
-  static const logLabel = 'PauseScreen';
+  static const _logLabel = 'PauseScreen';
   static const List<ScreenEvent> options = [ScreenEvent.resume, ScreenEvent.quit];
   final numOptions = options.length;
 
@@ -47,7 +47,7 @@ class PauseScreen extends Screen {
 
   @override
   void onKeySequence(List<int> seq, String hash, GameData state) {
-    Log.debug(logLabel, 'onKeySequence: ${hash}');
+    Log.debug(_logLabel, 'onKeySequence: ${hash}');
     ScreenEvent todo = ScreenEvent.nothing;
 
     if (config.isPause(hash)) {

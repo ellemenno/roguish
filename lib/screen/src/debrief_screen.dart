@@ -4,12 +4,12 @@ import 'package:rougish/term/terminal.dart' as term;
 import '../screen.dart';
 
 class DebriefScreen extends Screen {
-  static const logLabel = 'DebriefScreen';
+  static const _logLabel = 'DebriefScreen';
 
   @override
   void onKeySequence(List<int> seq, String hash, GameData state) {
     if (term.isEnter(seq)) {
-      Log.info(logLabel, 'Enter key detected. Exiting game..');
+      Log.info(_logLabel, 'Enter key detected. Exiting game..');
       broadcast(ScreenEvent.quit);
     }
   }

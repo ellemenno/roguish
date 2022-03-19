@@ -7,7 +7,7 @@ import 'package:rougish/term/terminal.dart' as term;
 import '../screen.dart';
 
 class LevelScreen extends Screen {
-  static const logLabel = 'LevelScreen';
+  static const _logLabel = 'LevelScreen';
 
   List<int> _mapSize() {
     List<int> dim = term.size();
@@ -59,12 +59,12 @@ class LevelScreen extends Screen {
       state.newLevel = false;
       List<int> dim = _mapSize();
       int cols = dim[0], rows = dim[1];
-      Log.debug(logLabel, 'draw() new map - rows: ${rows}, cols: ${cols}');
+      Log.debug(_logLabel, 'draw() new map - rows: ${rows}, cols: ${cols}');
       // if new dimensions:  dispose, allocate, generate
       // if empty:           ..       allocate, generate
       // if same dimensions: ..       ..        generate (will handle reset internally)
       if (rows != state.levelMap.length || cols != state.levelMap.first.length) {
-        Log.debug(logLabel, 'draw() new dimensions require new map');
+        Log.debug(_logLabel, 'draw() new dimensions require new map');
         if (state.levelMap.isNotEmpty) {
           map.LevelGenerator.dispose(state.levelMap, state.rooms, state.players);
         }

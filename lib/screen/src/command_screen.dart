@@ -6,7 +6,7 @@ import 'package:rougish/term/typing_buffer.dart';
 import '../screen.dart';
 
 class CommandScreen extends Screen {
-  static const logLabel = 'CommandScreen';
+  static const _logLabel = 'CommandScreen';
   final StringBuffer _cmd = StringBuffer();
   final TypingBuffer _input = TypingBuffer();
 
@@ -14,7 +14,7 @@ class CommandScreen extends Screen {
     String cmd = commandBuffer.toString();
 
     List<String> parts = cmd.split(' ');
-    Log.debug(logLabel, 'parseCommand: ${parts}');
+    Log.debug(_logLabel, 'parseCommand: ${parts}');
 
     switch (parts.first) {
       case 'quit':

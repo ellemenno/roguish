@@ -6,12 +6,12 @@ import 'package:rougish/term/terminal.dart' as term;
 import '../screen.dart';
 
 class SetupScreen extends Screen {
-  static const logLabel = 'SetupScreen';
+  static const _logLabel = 'SetupScreen';
 
   @override
   void onKeySequence(List<int> seq, String hash, GameData state) {
     if (term.isEnter(seq)) {
-      Log.info(logLabel, 'Enter key detected. advancing to level 1..');
+      Log.info(_logLabel, 'Enter key detected. advancing to level 1..');
       state.players.add(Creature(CreatureType.humanPlayer));
       broadcast(ScreenEvent.setupToLevel);
     }

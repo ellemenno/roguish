@@ -14,8 +14,7 @@ import './rectangle.dart';
 import './room.dart';
 
 class LevelGenerator {
-  static const logLabel = 'LevelGenerator'; // FIXME: make private
-
+  static const _logLabel = 'LevelGenerator';
   static final Set<Connector> _connectors = {};
 
   static bool _inbounds(int c, int r, List<List<Cell>> map) =>
@@ -124,7 +123,7 @@ class LevelGenerator {
     bool connected = false;
     bool stepping = true;
     int ic = sc + dc, ir = sr + dr;
-    Log.debug(logLabel, '_attemptPassage() starting stepping from ${ic}, ${ir}');
+    Log.debug(_logLabel, '_attemptPassage() starting stepping from ${ic}, ${ir}');
     while (!connected && stepping && _inbounds(ic, ir, map)) {
       switch (map[ir][ic].type) {
         case CellType.unexplored:
@@ -140,7 +139,7 @@ class LevelGenerator {
           // test that next cell is inside to avoid joining a corner
           connected = (map[ir + dr][ic + dc].type == CellType.floor);
           if (!connected) {
-            Log.debug(logLabel,
+            Log.debug(_logLabel,
                 '_attemptPassage() .. skipping corner at ${ic}, ${ir}, next cell is ${map[ir + dr][ic + dc].type}');
           }
           stepping = false;
@@ -159,7 +158,7 @@ class LevelGenerator {
       //   if connector is another passage, merge connections
       // add the new passage to _connectors
       Log.debug(
-          logLabel, '_attemptPassage() .. pathway found to ${c.runtimeType}; creating passage');
+          _logLabel, '_attemptPassage() .. pathway found to ${c.runtimeType}; creating passage');
       Passage passage = Passage(sc, sr, ic - dc, ir - dr);
       Connector.twoWayConnection(passage, room);
       if (c is Passage) {
@@ -171,7 +170,7 @@ class LevelGenerator {
       _paintPassage(map, sc, sr, dc, dr);
     }
 
-    Log.debug(logLabel, '_attemptPassage() from ${r}, headed ${d}, success? ${connected}');
+    Log.debug(_logLabel, '_attemptPassage() from ${r}, headed ${d}, success? ${connected}');
     return connected;
   }
 
@@ -262,7 +261,7 @@ class LevelGenerator {
     spaces = _splitHorV(Rectangle.byDimension(map.first.length, map.length), prng);
     spaces = _splitFurther(spaces);
     spaces = _bombByFrequency(spaces, prng);
-    Log.debug(logLabel, 'created ${spaces.length} incredible spaces');
+    Log.debug(_logLabel, 'created ${spaces.length} incredible spaces');
 
     Room room;
     for (Rectangle s in spaces) {
@@ -281,11 +280,11 @@ class LevelGenerator {
       for (Cardinal d in directions) {
         _attemptPassage(map, room, d, _connectors);
       }
-      Log.debug(logLabel, 'room ${i} has ${room.numConnections} connections');
+      Log.debug(_logLabel, 'room ${i} has ${room.numConnections} connections');
     }
     rooms.removeWhere((r) => r.numConnections == 0);
-    Log.info(logLabel, 'created ${rooms.length} from ${spaces.length} spaces');
-    Log.debug(logLabel, 'established ${_connectors.length} connectors');
+    Log.info(_logLabel, 'created ${rooms.length} from ${spaces.length} spaces');
+    Log.debug(_logLabel, 'established ${_connectors.length} connectors');
 
     Location loc = Location(-1, -1);
     for (Creature player in players) {
