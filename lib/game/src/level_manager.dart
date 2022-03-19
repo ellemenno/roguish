@@ -10,7 +10,7 @@ class LevelManager {
   static bool _isTraversable(Cell cell) {
     switch (cell.type) {
       case CellType.unexplored:
-        return true;
+        return false;
       case CellType.tunnelDim:
         return true;
       case CellType.tunnelBright:

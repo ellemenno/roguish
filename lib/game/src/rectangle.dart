@@ -1,35 +1,9 @@
 import 'dart:math' as math;
 
+/// A class for representing two-dimensional rectangles whose integer-based properties are mutable.
+///
+/// Similar, but different: [dart:math.Rectangle] offers immutable properties and requires use of the [dart:math.Point] class.
 class Rectangle {
-  int left;
-  int top;
-  int right;
-  int bottom;
-
-  int get width => right - left;
-  int get height => bottom - top;
-  int get midX => left + (width ~/ 2);
-  int get midY => top + (height ~/ 2);
-
-  @override
-  String toString() {
-    return '[${left},${top},${right},${bottom}]';
-  }
-
-  Rectangle(this.left, this.top, this.right, this.bottom);
-
-  Rectangle.square(int size)
-      : left = 0,
-        top = 0,
-        right = size,
-        bottom = size;
-
-  Rectangle.byDimension(int width, int height)
-      : left = 0,
-        top = 0,
-        right = width,
-        bottom = height;
-
   static bool isWithin(int col, int row, Rectangle r1) {
     if (col <= r1.left) {
       return false;
@@ -104,4 +78,33 @@ class Rectangle {
     r.right += dx;
     r.bottom += dy;
   }
+
+  int left;
+  int top;
+  int right;
+  int bottom;
+
+  int get width => right - left;
+  int get height => bottom - top;
+  int get midX => left + (width ~/ 2);
+  int get midY => top + (height ~/ 2);
+
+  @override
+  String toString() {
+    return '[${left},${top},${right},${bottom}]';
+  }
+
+  Rectangle(this.left, this.top, this.right, this.bottom);
+
+  Rectangle.square(int size)
+      : left = 0,
+        top = 0,
+        right = size,
+        bottom = size;
+
+  Rectangle.byDimension(int width, int height)
+      : left = 0,
+        top = 0,
+        right = width,
+        bottom = height;
 }

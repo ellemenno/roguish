@@ -9,6 +9,13 @@ import '../screen.dart';
 class LevelScreen extends Screen {
   static const logLabel = 'LevelScreen';
 
+  List<int> _mapSize() {
+    List<int> dim = term.size();
+    // leave a row at the top and bottom for the ui
+    dim[1] -= 2;
+    return dim;
+  }
+
   void _drawMap(StringBuffer screenBuffer, GameData state) {
     ansi.xy(screenBuffer, 0, 2);
     map.LevelManager.render(screenBuffer, state.levelMap);
@@ -48,12 +55,22 @@ class LevelScreen extends Screen {
 
   @override
   void draw(GameData state) {
-    if (state.levelMap.isEmpty) {
-      List<int> dim = term.size();
-      // leave a row at the top and bottom for the ui
-      Log.debug(logLabel, 'draw() new map - rows: ${dim[1] - 2}, cols: ${dim[0]}');
-      map.LevelGenerator.generate(state.levelMap, state.players, state.prng,
-          cols: dim[0], rows: dim[1] - 2);
+    if (state.newLevel) {
+      state.newLevel = false;
+      List<int> dim = _mapSize();
+      int cols = dim[0], rows = dim[1];
+      Log.debug(logLabel, 'draw() new map - rows: ${rows}, cols: ${cols}');
+      // if new dimensions:  dispose, allocate, generate
+      // if empty:           ..       allocate, generate
+      // if same dimensions: ..       ..        generate (will handle reset internally)
+      if (rows != state.levelMap.length || cols != state.levelMap.first.length) {
+        Log.debug(logLabel, 'draw() new dimensions require new map');
+        if (state.levelMap.isNotEmpty) {
+          map.LevelGenerator.dispose(state.levelMap, state.rooms, state.players);
+        }
+        map.LevelGenerator.allocate(state.levelMap, cols, rows);
+      }
+      map.LevelGenerator.generate(state.levelMap, state.rooms, state.players, state.prng);
     }
     _drawMap(screenBuffer, state);
     _drawUI(screenBuffer, state);

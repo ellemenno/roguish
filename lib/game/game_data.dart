@@ -2,15 +2,18 @@ import 'dart:math';
 
 import 'src/cell.dart';
 import 'src/creature.dart';
+import 'src/room.dart';
 
 class GameData {
   final Random prng;
+  final List<Creature> players = [];
+  final List<Room> rooms = [];
+  final List<List<Cell>> levelMap = [];
+
   late final Map<String, String> _conf;
   Map<String, String> get conf => _conf;
 
-  final List<Creature> players = [];
-
-  final List<List<Cell>> levelMap = [];
+  bool newLevel = true;
   int level = 1;
   int experience = 0;
   int health = 10;

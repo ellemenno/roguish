@@ -144,8 +144,8 @@ void onLevelRegen() {
   if (currentScreen != level) {
     Log.warn(logLabel, 'onLevelRegen() not currently on the level screen; ignoring command');
   }
-  Log.info(logLabel, 'onLevelRegen() clearing and regenerating level..');
-  state.levelMap.clear();
+  Log.info(logLabel, 'onLevelRegen() setting flag for level regeneration..');
+  state.newLevel = true;
   redrawScreens();
 }
 

@@ -22,5 +22,11 @@ class Cell {
     return '[${col.toString().padLeft(2, '0')},${row.toString().padLeft(2, '0')}:${this}]';
   }
 
+  void reset() {
+    occupant = Creature.noCreature;
+    contents = Item.noItem;
+    type = CellType.unexplored;
+  }
+
   Cell(this.col, this.row);
 }
