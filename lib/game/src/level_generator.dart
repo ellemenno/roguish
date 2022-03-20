@@ -83,18 +83,30 @@ class LevelGenerator {
     }
   }
 
-  static void _paintRoom(List<List<Cell>> map, Rectangle coords) {
+  static void _paintRoom(List<List<Cell>> map, Rectangle coords, {erasing = false}) {
     int c1 = coords.left;
     int c2 = coords.right - 1;
     int r1 = coords.top;
     int r2 = coords.bottom - 1;
+    CellType typeForCoords(int c, int r) {
+      if (erasing) {
+        return CellType.unexplored;
+      }
+      if (r == r1 || r == r2 || c == c1 || c == c2) {
+        return CellType.wallDim;
+      }
+      return CellType.floor;
+    }
 
     for (int r = r1; r <= r2; r++) {
       for (int c = c1; c <= c2; c++) {
-        map[r][c].type =
-            (r == r1 || r == r2 || c == c1 || c == c2) ? CellType.wallDim : CellType.floor;
+        map[r][c].type = typeForCoords(c, r);
       }
     }
+  }
+
+  static void _unpaintRoom(List<List<Cell>> map, Rectangle coords) {
+    _paintRoom(map, coords, erasing: true);
   }
 
   static bool _attemptPassage(List<List<Cell>> map, Room room, Cardinal d, Set<Connector> cnx) {
@@ -121,8 +133,20 @@ class LevelGenerator {
     }
 
     bool connected = false;
-    bool stepping = true;
     int ic = sc + dc, ir = sr + dr;
+
+    CellType t = map[sr][sc].type;
+    if (t == CellType.doorH || t == CellType.doorV) {
+      connected = true;
+      Connector passage = _getConnectorAt(ic, ir, cnx);
+      assert(passage is Passage);
+      room.connectTo(passage);
+      Log.debug(_logLabel,
+          '_attemptPassage() .. door already exists at ${sc}, ${sr} to passage at ${ic}, ${ir}');
+      return connected;
+    }
+
+    bool stepping = true;
     Log.debug(_logLabel, '_attemptPassage() starting stepping from ${ic}, ${ir}');
     while (!connected && stepping && _inbounds(ic, ir, map)) {
       switch (map[ir][ic].type) {
@@ -174,25 +198,21 @@ class LevelGenerator {
     return connected;
   }
 
-  static List<Rectangle> _bombByFrequency(List<Rectangle> input, math.Random prng, {freq = 0.66}) {
+  static List<Rectangle> _bombByTotal(List<Rectangle> input, math.Random prng, {retention = 0.66}) {
     List<Rectangle> result = [];
-    int n = input.length;
+    int n = (input.length * retention).round();
     for (int i = 0; i < n; i++) {
-      if (prng.nextDouble() >= freq) {
-        result.add(input.removeAt(i));
-        i -= 1;
-        n = input.length;
-      }
+      result.add(input.removeAt(prng.nextInt(input.length)));
     }
     return result;
   }
 
   static List<Rectangle> _splitFurther(List<Rectangle> input,
-      {maxR = 2.5, minDim = 4, halfGap = 2}) {
+      {maxRatio = 2.5, minDim = 4, halfGap = 2}) {
     List<Rectangle> result = [];
     Rectangle r1;
     Rectangle r2;
-    bool shouldSplit(int w, int h) => (math.max(w, h) / math.min(w, h) >= maxR);
+    bool shouldSplit(int w, int h) => (math.max(w, h) / math.min(w, h) >= maxRatio);
     bool isSplittable(int dim) => dim >= ((minDim + 2) * 2);
 
     while (input.isNotEmpty) {
@@ -253,17 +273,37 @@ class LevelGenerator {
     map.clear();
   }
 
+  static List<Rectangle> makeSpaces(int cols, int rows, math.Random prng, {density = 0.50}) {
+    List<Rectangle> spaces;
+    // super dense:
+    //   _splitHorV(.. minDim: 3, halfGap: 1)
+    //   _splitFurther(.. maxRatio: 2.5, minDim: 4, halfGap: 2)
+    //   _bombByTotal(.. retention: 1.0)
+    // light and open:
+    //   _splitHorV(.. minDim: 6, halfGap: 2)
+    //   _splitFurther(.. maxRatio: 2.0, minDim: 5, halfGap: 4)
+    //   _bombByTotal(.. retention: 0.45)
+    int ilerp(int a, int b, num t) => a + ((b-a) * t).round();
+    num nlerp(num a, num b, num t) => a + (b-a) * t;
+    spaces = _splitHorV(Rectangle.byDimension(cols, rows), prng, minDim: ilerp(6,3,density), halfGap: ilerp(2,1,density));
+    spaces = _splitFurther(spaces, maxRatio: nlerp(2.0,2.5,density), minDim: ilerp(5,3,density), halfGap: ilerp(4,2,density));
+    spaces = _bombByTotal(spaces, prng, retention: nlerp(0.45,1.0,density));
+    Log.debug(_logLabel, 'makeSpaces() created ${spaces.length} incredible spaces');
+    return spaces;
+  }
+
   static void generate(
-      List<List<Cell>> map, List<Room> rooms, List<Creature> players, math.Random prng) {
+      List<List<Cell>> map,
+      List<Room> rooms,
+      List<Creature> players,
+      math.Random prng,
+      int level,
+      int maxLevel) {
+
     _reset(map, rooms);
 
-    List<Rectangle> spaces;
-    spaces = _splitHorV(Rectangle.byDimension(map.first.length, map.length), prng);
-    spaces = _splitFurther(spaces);
-    spaces = _bombByFrequency(spaces, prng);
-    Log.debug(_logLabel, 'created ${spaces.length} incredible spaces');
-
     Room room;
+    List<Rectangle> spaces = makeSpaces(map.first.length, map.length, prng, density: level/maxLevel);
     for (Rectangle s in spaces) {
       room = Room(s);
       rooms.add(room);
@@ -280,11 +320,36 @@ class LevelGenerator {
       for (Cardinal d in directions) {
         _attemptPassage(map, room, d, _connectors);
       }
-      Log.debug(_logLabel, 'room ${i} has ${room.numConnections} connections');
     }
-    rooms.removeWhere((r) => r.numConnections == 0);
-    Log.info(_logLabel, 'created ${rooms.length} from ${spaces.length} spaces');
-    Log.debug(_logLabel, 'established ${_connectors.length} connectors');
+    // unpaint and remove rooms without any connections
+    bool purging = true;
+    while (purging) {
+      int i = rooms.indexWhere((r) => r.numConnections == 0);
+      if (i >= 0) {
+        room = rooms.removeAt(i);
+        Log.debug(_logLabel, '.. room at ${room.coords} has zero connections');
+        _unpaintRoom(map, room.coords);
+        _connectors.remove(room);
+      } else {
+        purging = false;
+      }
+    }
+    Log.info(_logLabel, 'generate() created ${rooms.length} rooms from ${spaces.length} spaces');
+    Log.debug(_logLabel, 'generate() established ${_connectors.length} connectors');
+
+    String ctype(Connector c) {
+      if (c is Room) {
+        return 'Room';
+      }
+      if (c is Passage) {
+        return 'Passage';
+      }
+      return c.runtimeType.toString();
+    }
+
+    for (Connector c in _connectors) {
+      Log.debug(_logLabel, '.. ${ctype(c)} ${c.toScreenString()}');
+    }
 
     Location loc = Location(-1, -1);
     for (Creature player in players) {

@@ -24,7 +24,10 @@ class Connector {
 
   void disconnectFrom(Connector node) => _connections.remove(node);
   void removeAllConnections() => _connections.clear();
-  bool contains(int c, int r) => false; // for extenders to override
+
+  // for extenders to override
+  bool contains(int c, int r) => false;
+  String toScreenString() => '';
 
   Connector();
   Connector._empty();

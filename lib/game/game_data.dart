@@ -9,6 +9,7 @@ class GameData {
   final List<Creature> players = [];
   final List<Room> rooms = [];
   final List<List<Cell>> levelMap = [];
+  final int levelMax = 10;
 
   late final Map<String, String> _conf;
   Map<String, String> get conf => _conf;

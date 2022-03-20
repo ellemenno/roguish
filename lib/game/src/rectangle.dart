@@ -90,9 +90,7 @@ class Rectangle {
   int get midY => top + (height ~/ 2);
 
   @override
-  String toString() {
-    return '[${left},${top},${right},${bottom}]';
-  }
+  String toString() => '[${left},${top},${right},${bottom}]';
 
   Rectangle(this.left, this.top, this.right, this.bottom);
 

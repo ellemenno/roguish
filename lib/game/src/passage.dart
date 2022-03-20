@@ -26,6 +26,12 @@ class Passage extends Connector {
   int c2, r2;
 
   @override
+  String toString() => '(${c1},${r1})->(${c2},${r2})';
+
+  @override
+  String toScreenString() => 'ln:${r1 + 1},col:${c1 + 1}->ln:${r2 + 1},col:${c2 + 1}';
+
+  @override
   bool contains(int c, int r) => Passage.isWithin(c, r, this);
 
   bool get isHorizontal => (r1 == r2);

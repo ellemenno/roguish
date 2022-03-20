@@ -17,7 +17,7 @@ class LevelScreen extends Screen {
   }
 
   void _drawMap(StringBuffer screenBuffer, GameData state) {
-    ansi.xy(screenBuffer, 0, 2);
+    ansi.xy(screenBuffer, 1, 2);
     map.LevelManager.render(screenBuffer, state.levelMap);
   }
 
@@ -59,18 +59,18 @@ class LevelScreen extends Screen {
       state.newLevel = false;
       List<int> dim = _mapSize();
       int cols = dim[0], rows = dim[1];
-      Log.debug(_logLabel, 'draw() new map - rows: ${rows}, cols: ${cols}');
+      Log.debug(_logLabel, 'draw() new level - level: ${state.level}, rows: ${rows}, cols: ${cols}');
       // if new dimensions:  dispose, allocate, generate
       // if empty:           ..       allocate, generate
       // if same dimensions: ..       ..        generate (will handle reset internally)
       if (rows != state.levelMap.length || cols != state.levelMap.first.length) {
-        Log.debug(_logLabel, 'draw() new dimensions require new map');
+        Log.debug(_logLabel, 'draw() new dimensions require map reallocation');
         if (state.levelMap.isNotEmpty) {
           map.LevelGenerator.dispose(state.levelMap, state.rooms, state.players);
         }
         map.LevelGenerator.allocate(state.levelMap, cols, rows);
       }
-      map.LevelGenerator.generate(state.levelMap, state.rooms, state.players, state.prng);
+      map.LevelGenerator.generate(state.levelMap, state.rooms, state.players, state.prng, state.level, state.levelMax);
     }
     _drawMap(screenBuffer, state);
     _drawUI(screenBuffer, state);
