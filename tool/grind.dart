@@ -17,9 +17,8 @@ void todo() {
   const token = 'TODO';
   if (Platform.isWindows) {
     run('findstr', arguments: ['/s', '/n', '\\/\\/${token}:', '*.dart']);
-  }
-  else {
-    run('grep', arguments: ['//${token}:', '--recursive', '--line-number', '--include', '\*.dart']);
+  } else {
+    run('grep', arguments: ['//${token}:', '--recursive', '--line-number', '--include', '\\*.dart']);
   }
 }
 
@@ -28,9 +27,8 @@ void fixme() {
   const token = 'FIXME';
   if (Platform.isWindows) {
     run('findstr', arguments: ['/s', '/n', '\\/\\/${token}:', '*.dart']);
-  }
-  else {
-    run('grep', arguments: ['//${token}:', '--recursive', '--line-number', '--include', '\*.dart']);
+  } else {
+    run('grep', arguments: ['//${token}:', '--recursive', '--line-number', '--include', '\\*.dart']);
   }
 }
 
