@@ -283,27 +283,26 @@ class LevelGenerator {
     //   _splitHorV(.. minDim: 6, halfGap: 2)
     //   _splitFurther(.. maxRatio: 2.0, minDim: 5, halfGap: 4)
     //   _bombByTotal(.. retention: 0.45)
-    int ilerp(int a, int b, num t) => a + ((b-a) * t).round();
-    num nlerp(num a, num b, num t) => a + (b-a) * t;
-    spaces = _splitHorV(Rectangle.byDimension(cols, rows), prng, minDim: ilerp(6,3,density), halfGap: ilerp(2,1,density));
-    spaces = _splitFurther(spaces, maxRatio: nlerp(2.0,2.5,density), minDim: ilerp(5,3,density), halfGap: ilerp(4,2,density));
-    spaces = _bombByTotal(spaces, prng, retention: nlerp(0.45,1.0,density));
+    int ilerp(int a, int b, num t) => a + ((b - a) * t).round();
+    num nlerp(num a, num b, num t) => a + (b - a) * t;
+    spaces = _splitHorV(Rectangle.byDimension(cols, rows), prng,
+        minDim: ilerp(6, 3, density), halfGap: ilerp(2, 1, density));
+    spaces = _splitFurther(spaces,
+        maxRatio: nlerp(2.0, 2.5, density),
+        minDim: ilerp(5, 3, density),
+        halfGap: ilerp(4, 2, density));
+    spaces = _bombByTotal(spaces, prng, retention: nlerp(0.45, 1.0, density));
     Log.debug(_logLabel, 'makeSpaces() created ${spaces.length} incredible spaces');
     return spaces;
   }
 
-  static void generate(
-      List<List<Cell>> map,
-      List<Room> rooms,
-      List<Creature> players,
-      math.Random prng,
-      int level,
-      int maxLevel) {
-
+  static void generate(List<List<Cell>> map, List<Room> rooms, List<Creature> players,
+      math.Random prng, int level, int maxLevel) {
     _reset(map, rooms);
 
     Room room;
-    List<Rectangle> spaces = makeSpaces(map.first.length, map.length, prng, density: level/maxLevel);
+    List<Rectangle> spaces =
+        makeSpaces(map.first.length, map.length, prng, density: level / maxLevel);
     for (Rectangle s in spaces) {
       room = Room(s);
       rooms.add(room);

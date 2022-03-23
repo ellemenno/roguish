@@ -18,7 +18,8 @@ void todo() {
   if (Platform.isWindows) {
     run('findstr', arguments: ['/s', '/n', '\\/\\/${token}:', '*.dart']);
   } else {
-    run('grep', arguments: ['//${token}:', '--recursive', '--line-number', '--include', '\\*.dart']);
+    run('grep',
+        arguments: ['//${token}:', '--recursive', '--line-number', '--include', '\\*.dart']);
   }
 }
 
@@ -28,7 +29,8 @@ void fixme() {
   if (Platform.isWindows) {
     run('findstr', arguments: ['/s', '/n', '\\/\\/${token}:', '*.dart']);
   } else {
-    run('grep', arguments: ['//${token}:', '--recursive', '--line-number', '--include', '\\*.dart']);
+    run('grep',
+        arguments: ['//${token}:', '--recursive', '--line-number', '--include', '\\*.dart']);
   }
 }
 

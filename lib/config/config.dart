@@ -40,7 +40,8 @@ LogLevel logLevel(Map<String, String> conf, {defaultLevel = LogLevel.none}) {
 }
 
 int prngSeed(Map<String, String> conf) {
-  return int.parse(conf['prng_seed'] ?? '${DateTime.now().microsecond * DateTime.now().millisecond}');
+  return int.parse(
+      conf['prng_seed'] ?? '${DateTime.now().microsecond * DateTime.now().millisecond}');
 }
 
 List<int> keyCommandBar(Map<String, String> conf, {defaultCodes = '0x20'}) {
