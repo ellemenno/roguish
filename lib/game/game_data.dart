@@ -10,7 +10,9 @@ class GameData {
   final List<List<Cell>> levelMap = [];
   final int levelMax = 10;
 
-  late final Map<String, String> _conf;
+  final List<String> cmdArgs = [];
+
+  final Map<String, String> _conf;
   Map<String, String> get conf => _conf;
 
   Random _prng;

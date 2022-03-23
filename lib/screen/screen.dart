@@ -17,6 +17,7 @@ enum ScreenEvent {
   quit,
   regen,
   resume,
+  setLevel,
   setupToLevel,
   title,
   titleToSetup,

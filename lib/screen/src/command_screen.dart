@@ -10,11 +10,12 @@ class CommandScreen extends Screen {
   final StringBuffer _cmd = StringBuffer();
   final TypingBuffer _input = TypingBuffer();
 
-  ScreenEvent parseCommand(StringBuffer commandBuffer) {
+  ScreenEvent parseCommand(StringBuffer commandBuffer, GameData state) {
     String cmd = commandBuffer.toString();
 
     List<String> parts = cmd.split(' ');
-    Log.debug(_logLabel, 'parseCommand: ${parts}');
+    Log.debug(_logLabel, 'parseCommand() ${parts}');
+    state.cmdArgs.clear();
 
     switch (parts.first) {
       case 'quit':
@@ -22,6 +23,19 @@ class CommandScreen extends Screen {
         return ScreenEvent.quit;
       case 'debrief':
         return ScreenEvent.debrief;
+      case 'level':
+        if (parts.length != 2) {
+          Log.warn(
+              _logLabel, '.. expected one arg for level, got ${parts.length - 1} values instead');
+          break;
+        }
+        if (int.tryParse(parts[1]) != null) {
+          state.cmdArgs.add(parts[1]);
+          return ScreenEvent.setLevel;
+        } else {
+          Log.warn(_logLabel, '.. invalid level: ${parts[1]} (expected int)');
+          break;
+        }
       case 'regen':
         return ScreenEvent.regen;
       case 'title':
@@ -39,7 +53,7 @@ class CommandScreen extends Screen {
     } else if (term.isEnter(seq)) {
       _input.toStringBuffer(_cmd, withFormatting: false);
       _input.clear();
-      todo = parseCommand(_cmd);
+      todo = parseCommand(_cmd, state);
     } else if (config.isCursorLeft(hash)) {
       _input.cursorLeft();
     } else if (config.isCursorRight(hash)) {

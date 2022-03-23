@@ -140,6 +140,16 @@ void onTitle() {
   pushScreen(title); // add title
 }
 
+void onSetLevel() {
+  int levelNum = int.parse(state.cmdArgs.first);
+  Log.info(logLabel, 'onSetLevel() changing to level ${levelNum}..');
+  state.level = levelNum;
+  if (currentScreen == level) {
+    state.newLevel = true;
+    redrawScreens();
+  }
+}
+
 void onLevelRegen() {
   if (currentScreen != level) {
     Log.warn(logLabel, 'onLevelRegen() not currently on the level screen; ignoring command');
@@ -197,6 +207,9 @@ void onScreenEvent(ScreenEvent event) {
       break;
     case ScreenEvent.regen:
       onLevelRegen();
+      break;
+    case ScreenEvent.setLevel:
+      onSetLevel();
       break;
     default:
       Log.warn(logLabel, 'screen event: ${event}; (no action)');
