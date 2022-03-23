@@ -145,6 +145,9 @@ void onLevelRegen() {
     Log.warn(logLabel, 'onLevelRegen() not currently on the level screen; ignoring command');
   }
   Log.info(logLabel, 'onLevelRegen() setting flag for level regeneration..');
+  int prngSeed = DateTime.now().microsecond * DateTime.now().millisecond;
+  Log.info(logLabel, '.. seed = ${prngSeed}');
+  state.reseed(prngSeed);
   state.newLevel = true;
   redrawScreens();
 }
@@ -242,11 +245,13 @@ void addSignalListeners() {
 
 void main(List<String> arguments) {
   Map<String, String> conf = config.fromFile('bin/rougish.conf');
-  state = GameData(conf, seed: config.prngSeed(conf));
+  int prngSeed = config.prngSeed(conf);
+  state = GameData(conf, prngSeed);
 
   Log.toFile();
   Log.level = config.logLevel(state.conf);
   Log.info(logLabel, 'app startup. logging initialized at ${Log.level}. args = ${arguments}');
+  Log.info(logLabel, 'seed = ${prngSeed}');
   Log.debug(logLabel, 'conf = ${state.conf}');
 
   config.setKeys(state.conf);
