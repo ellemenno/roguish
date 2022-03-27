@@ -25,6 +25,8 @@ class Connector {
   void disconnectFrom(Connector node) => _connections.remove(node);
   void removeAllConnections() => _connections.clear();
 
+  String toConnectionString() => '[${_connections.join(', ')}]';
+
   // for extenders to override
   bool contains(int c, int r) => false;
   String toScreenString() => '';

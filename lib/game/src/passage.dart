@@ -26,10 +26,11 @@ class Passage extends Connector {
   int c2, r2;
 
   @override
-  String toString() => '(${c1},${r1})->(${c2},${r2})';
+  String toString() => 'P(${c1},${r1});(${c2},${r2})';
 
+  // ln:col format
   @override
-  String toScreenString() => 'ln:${r1 + 1},col:${c1 + 1}->ln:${r2 + 1},col:${c2 + 1}';
+  String toScreenString() => '${r1 + 1}:${c1 + 1}->${r2 + 1}:${c2 + 1}';
 
   @override
   bool contains(int c, int r) => Passage.isWithin(c, r, this);

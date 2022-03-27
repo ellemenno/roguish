@@ -7,11 +7,12 @@ class Room extends Connector {
   Rectangle coords;
 
   @override
-  String toString() => coords.toString();
+  String toString() => 'R${coords.toString()}';
 
+  // ln:col format
   @override
   String toScreenString() =>
-      'ln:${coords.top + 1},col:${coords.left + 1}->ln:${coords.bottom + 1},col:${coords.right + 1}';
+      '${coords.top + 1}:${coords.left + 1}->${coords.bottom + 1}:${coords.right + 1}';
 
   @override
   bool contains(int c, int r) => Rectangle.isWithin(c, r, coords);
