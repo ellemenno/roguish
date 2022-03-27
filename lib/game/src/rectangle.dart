@@ -36,6 +36,18 @@ class Rectangle {
     return true;
   }
 
+  static int leftMost(List<Rectangle> list) =>
+      list.fold(list.first.left, (v, e) => math.min(v, e.left));
+
+  static int rightMost(List<Rectangle> list) =>
+      list.fold(list.first.right, (v, e) => math.max(v, e.right));
+
+  static int topMost(List<Rectangle> list) =>
+      list.fold(list.first.top, (v, e) => math.min(v, e.top));
+
+  static int bottomMost(List<Rectangle> list) =>
+      list.fold(list.first.bottom, (v, e) => math.max(v, e.bottom));
+
   static Rectangle bounding(Rectangle r1, Rectangle r2) {
     return Rectangle(math.min(r1.left, r2.left), math.min(r1.top, r2.top),
         math.max(r1.right, r2.right), math.max(r1.bottom, r2.bottom));
@@ -59,15 +71,35 @@ class Rectangle {
     return r2;
   }
 
-  static void resize(Rectangle r, {int dl = 0, int dt = 0, int dr = 0, int db = 0}) {
+  static void randomShrink(Rectangle r, math.Random prng, {int minW = 4, int minH = 4}) {
+    if (r.width < minW) {
+      throw Exception('rectangle width ${r.width} is already smaller than minW ${minW}');
+    }
+    if (r.height < minH) {
+      throw Exception('rectangle height ${r.height} is already smaller than minH ${minH}');
+    }
+    int dw = r.width - minW;
+    int dh = r.height - minH;
+    int ilerp(int a, int b, num t) => a + ((b - a) * t).round();
+
+    int dl = ilerp(0, dw, prng.nextDouble());
+    int dr = -1 * ilerp(0, (dw - dl), prng.nextDouble());
+    int dt = ilerp(0, dh, prng.nextDouble());
+    int db = -1 * ilerp(0, (dh - dt), prng.nextDouble());
+
+    resize(r, dl: dl, dt: dt, dr: dr, db: db, minW: minW, minH: minH);
+  }
+
+  static void resize(Rectangle r,
+      {int dl = 0, int dt = 0, int dr = 0, int db = 0, int minW = 3, int minH = 3}) {
     r.left += dl;
     r.top += dt;
     r.right += dr;
     r.bottom += db;
-    if (r.width <= 3) {
+    if (r.width < minW) {
       throw Exception('rectangle resized to invalid width');
     }
-    if (r.height <= 3) {
+    if (r.height < minH) {
       throw Exception('rectangle resized to invalid height');
     }
   }
@@ -91,6 +123,8 @@ class Rectangle {
 
   @override
   String toString() => '[${left},${top},${right},${bottom}]';
+
+  Rectangle clone() => Rectangle.byDimension(width, height);
 
   Rectangle(this.left, this.top, this.right, this.bottom);
 

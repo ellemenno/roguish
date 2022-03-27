@@ -17,11 +17,30 @@ class LevelGenerator {
   static const _logLabel = 'LevelGenerator';
   static final Set<Connector> _connectors = {};
 
-  static bool _inbounds(int c, int r, List<List<Cell>> map) =>
+  static bool _isInbounds(int c, int r, List<List<Cell>> map) =>
       (c >= 0 && c < map.first.length && r >= 0 && r < map.length);
 
-  static Connector _getConnectorAt(int col, int row, Set<Connector> connections) {
-    for (Connector c in connections) {
+  static String _lnCol(int col, int row) => '${row + 1}:${col + 1}';
+
+  static String _connectorType(Connector c) {
+    if (c is Room) {
+      return 'Room';
+    }
+    if (c is Passage) {
+      return 'Passage';
+    }
+    return c.runtimeType.toString();
+  }
+
+  static void _printConnectors(Set<Connector> connectors) {
+    for (Connector c in connectors) {
+      Log.debug(
+          _logLabel, '.. ${_connectorType(c)} ${c.toScreenString()} ${c.toConnectionString()}');
+    }
+  }
+
+  static Connector _getConnectorAt(int col, int row, Set<Connector> connectors) {
+    for (Connector c in connectors) {
       if (c.contains(col, row)) {
         return c;
       }
@@ -109,7 +128,8 @@ class LevelGenerator {
     _paintRoom(map, coords, erasing: true);
   }
 
-  static bool _attemptPassage(List<List<Cell>> map, Room room, Cardinal d, Set<Connector> cnx) {
+  static bool _attemptPassage(
+      List<List<Cell>> map, Room room, Cardinal d, Set<Connector> connectors) {
     Rectangle r = room.coords;
     int dc = 0, dr = 0;
     int sc = r.midX, sr = r.midY;
@@ -135,20 +155,22 @@ class LevelGenerator {
     bool connected = false;
     int ic = sc + dc, ir = sr + dr;
 
+    Log.debug(_logLabel,
+        '_attemptPassage() try stepping ${d} at ${_lnCol(ic, ir)} from ${room.toScreenString()}');
+
     CellType t = map[sr][sc].type;
     if (t == CellType.doorH || t == CellType.doorV) {
       connected = true;
-      Connector passage = _getConnectorAt(ic, ir, cnx);
+      Connector passage = _getConnectorAt(ic, ir, connectors);
       assert(passage is Passage);
       room.connectTo(passage);
       Log.debug(_logLabel,
-          '_attemptPassage() .. door already exists at ${sc}, ${sr} to passage at ${ic}, ${ir}');
+          '.. door already exists at ${_lnCol(sc, sr)} to existing passage at ${_lnCol(ic, ir)}. done here.');
       return connected;
     }
 
     bool stepping = true;
-    Log.debug(_logLabel, '_attemptPassage() starting stepping from ${ic}, ${ir}');
-    while (!connected && stepping && _inbounds(ic, ir, map)) {
+    while (!connected && stepping && _isInbounds(ic, ir, map)) {
       switch (map[ir][ic].type) {
         case CellType.unexplored:
           ic += dc;
@@ -156,15 +178,17 @@ class LevelGenerator {
           break;
         case CellType.tunnelDim:
         case CellType.tunnelBright:
+          Log.debug(_logLabel, '.. bumped into tunnel at ${_lnCol(ic, ir)}');
           connected = true;
           break;
         case CellType.wallDim:
         case CellType.wallBright:
-          // test that next cell is inside to avoid joining a corner
+          Log.debug(_logLabel, '.. bumped into room at ${_lnCol(ic, ir)}');
+          // test that next cell is interior to avoid joining to a corner
           connected = (map[ir + dr][ic + dc].type == CellType.floor);
           if (!connected) {
             Log.debug(_logLabel,
-                '_attemptPassage() .. skipping corner at ${ic}, ${ir}, next cell is ${map[ir + dr][ic + dc].type}');
+                '.. skipping corner at ${_lnCol(ic, ir)}, next cell is ${map[ir + dr][ic + dc].type}');
           }
           stepping = false;
           break;
@@ -176,26 +200,108 @@ class LevelGenerator {
     }
 
     if (connected) {
-      Connector c = _getConnectorAt(ic, ir, cnx);
+      Connector c = _getConnectorAt(ic, ir, connectors);
       assert(c != Connector.noConnector);
       // create a new Passage, connect to initial room and newly found connector
       //   if connector is another passage, merge connections
       // add the new passage to _connectors
-      Log.debug(
-          _logLabel, '_attemptPassage() .. pathway found to ${c.runtimeType}; creating passage');
-      Passage passage = Passage(sc, sr, ic - dc, ir - dr);
-      Connector.twoWayConnection(passage, room);
-      if (c is Passage) {
-        Connector.mergeConnections(passage, c);
-      } else {
+      Log.debug(_logLabel,
+          '.. creating passage from ${_connectorType(room)} ${room.toScreenString()} to ${_connectorType(c)} ${c.toScreenString()}');
+      Passage passage = Passage(sc + dc, sr + dr, ic - dc, ir - dr);
+      Connector.twoWayConnection(room, passage);
+      if (c is Room) {
         Connector.twoWayConnection(passage, c);
+      } else {
+        Connector.mergeConnections(passage, c);
       }
       _connectors.add(passage);
       _paintPassage(map, sc, sr, dc, dr);
     }
 
-    Log.debug(_logLabel, '_attemptPassage() from ${r}, headed ${d}, success? ${connected}');
     return connected;
+  }
+
+  static List<Rectangle> _ensureQuadrantCoverage(
+      List<Rectangle> input, math.Random prng, Rectangle bounds,
+      {int halfGap = 2}) {
+    // if two diagonal quadrants are empty, there can be disconnected room clusters
+    //
+    //   q2.q1   #=#.....     +.......
+    //   q3.q4   .....#=#     ...#=#=#
+    //
+    //           seed:28282   seed:146412
+    //
+    List<Rectangle> q1 = [];
+    List<Rectangle> q2 = [];
+    List<Rectangle> q3 = [];
+    List<Rectangle> q4 = [];
+
+    // sort into quadrants
+    for (Rectangle r in input) {
+      if (r.midX > bounds.midX) {
+        if (r.midY < bounds.midY) {
+          q1.add(r);
+        } else {
+          q4.add(r);
+        }
+      } else {
+        if (r.midY < bounds.midY) {
+          q2.add(r);
+        } else {
+          q3.add(r);
+        }
+      }
+    }
+    Log.debug(_logLabel,
+        '_ensureQuadrantCoverage() ${q1.length} in q1, ${q2.length} in q2, ${q3.length} in q3, ${q4.length} in q4');
+    Log.debug(_logLabel, '..  q2.q1');
+    Log.debug(_logLabel, '..  q3.q4');
+
+    // if diagonals are empty, add a new space
+    if (q1.isEmpty && q3.isEmpty) {
+      int l, t, r, b;
+      if (prng.nextBool()) {
+        // q1
+        l = Rectangle.rightMost(q2) + halfGap;
+        t = bounds.top;
+        r = bounds.right;
+        b = Rectangle.topMost(q4) - halfGap;
+      } else {
+        // q3
+        l = bounds.left;
+        t = Rectangle.bottomMost(q2) + halfGap;
+        r = Rectangle.leftMost(q4) - halfGap;
+        b = bounds.bottom;
+      }
+      Rectangle newSpace = Rectangle(l, t, r, b);
+      Rectangle.randomShrink(newSpace, prng);
+      input.add(newSpace);
+      Log.debug(_logLabel,
+          '_ensureQuadrantCoverage() Q1, Q3 empty, adding ${input.last} to ensure connectivity');
+    }
+    if (q2.isEmpty && q4.isEmpty) {
+      int l, t, r, b;
+      if (prng.nextBool()) {
+        // q2
+        l = bounds.left;
+        t = bounds.top;
+        r = Rectangle.leftMost(q1) - halfGap;
+        b = Rectangle.topMost(q3) - halfGap;
+      } else {
+        // q4
+        l = Rectangle.rightMost(q3) + halfGap;
+        t = Rectangle.bottomMost(q1) + halfGap;
+        r = bounds.right;
+        b = bounds.bottom;
+      }
+      Rectangle newSpace = Rectangle(l, t, r, b);
+      Rectangle.randomShrink(newSpace, prng);
+      input.add(newSpace);
+      Log.debug(_logLabel,
+          '_ensureQuadrantCoverage() Q2, Q4 empty, adding ${input.last} to ensure connectivity');
+    }
+
+    return input;
   }
 
   static List<Rectangle> _bombByTotal(List<Rectangle> input, math.Random prng, {retention = 0.66}) {
@@ -274,6 +380,7 @@ class LevelGenerator {
   }
 
   static List<Rectangle> makeSpaces(int cols, int rows, math.Random prng, {density = 0.50}) {
+    Rectangle bounds = Rectangle.byDimension(cols, rows);
     List<Rectangle> spaces;
     // super dense:
     //   _splitHorV(.. minDim: 3, halfGap: 1)
@@ -285,13 +392,14 @@ class LevelGenerator {
     //   _bombByTotal(.. retention: 0.45)
     int ilerp(int a, int b, num t) => a + ((b - a) * t).round();
     num nlerp(num a, num b, num t) => a + (b - a) * t;
-    spaces = _splitHorV(Rectangle.byDimension(cols, rows), prng,
+    spaces = _splitHorV(bounds.clone(), prng,
         minDim: ilerp(6, 3, density), halfGap: ilerp(2, 1, density));
     spaces = _splitFurther(spaces,
         maxRatio: nlerp(2.0, 2.5, density),
         minDim: ilerp(5, 3, density),
         halfGap: ilerp(4, 2, density));
     spaces = _bombByTotal(spaces, prng, retention: nlerp(0.45, 1.0, density));
+    spaces = _ensureQuadrantCoverage(spaces, prng, bounds);
     Log.debug(_logLabel, 'makeSpaces() created ${spaces.length} incredible spaces');
     return spaces;
   }
@@ -301,6 +409,7 @@ class LevelGenerator {
     _reset(map, rooms);
 
     Room room;
+    Log.debug(_logLabel, 'generate() making spaces..');
     List<Rectangle> spaces =
         makeSpaces(map.first.length, map.length, prng, density: level / maxLevel);
     for (Rectangle s in spaces) {
@@ -316,6 +425,7 @@ class LevelGenerator {
     for (int i in toConnect) {
       room = rooms[i];
       directions.shuffle(prng);
+      Log.debug(_logLabel, 'generate() find connections for room ${room.toScreenString()}');
       for (Cardinal d in directions) {
         _attemptPassage(map, room, d, _connectors);
       }
@@ -326,7 +436,8 @@ class LevelGenerator {
       int i = rooms.indexWhere((r) => r.numConnections == 0);
       if (i >= 0) {
         room = rooms.removeAt(i);
-        Log.debug(_logLabel, '.. room at ${room.coords} has zero connections');
+        Log.debug(_logLabel,
+            'generate() room ${room.toScreenString()} has zero connections; unpainting..');
         _unpaintRoom(map, room.coords);
         _connectors.remove(room);
       } else {
@@ -335,19 +446,8 @@ class LevelGenerator {
     }
     Log.info(_logLabel, 'generate() created ${rooms.length} rooms from ${spaces.length} spaces');
     Log.debug(_logLabel, 'generate() established ${_connectors.length} connectors');
-
-    String ctype(Connector c) {
-      if (c is Room) {
-        return 'Room';
-      }
-      if (c is Passage) {
-        return 'Passage';
-      }
-      return c.runtimeType.toString();
-    }
-
-    for (Connector c in _connectors) {
-      Log.debug(_logLabel, '.. ${ctype(c)} ${c.toScreenString()}');
+    if (Log.level == LogLevel.debug) {
+      _printConnectors(_connectors);
     }
 
     Location loc = Location(-1, -1);
