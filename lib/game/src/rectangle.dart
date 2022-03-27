@@ -4,17 +4,17 @@ import 'dart:math' as math;
 ///
 /// Similar, but different: [dart:math.Rectangle] offers immutable properties and requires use of the [dart:math.Point] class.
 class Rectangle {
-  static bool isWithin(int col, int row, Rectangle r1) {
-    if (col <= r1.left) {
+  static bool isWithin(int col, int row, Rectangle r) {
+    if (col < r.left) {
       return false;
     }
-    if (col >= r1.right) {
+    if (col >= r.right) {
       return false;
     }
-    if (row <= r1.top) {
+    if (row < r.top) {
       return false;
     }
-    if (row >= r1.bottom) {
+    if (row >= r.bottom) {
       return false;
     }
     return true;
