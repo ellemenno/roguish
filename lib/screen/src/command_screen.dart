@@ -10,6 +10,42 @@ class CommandScreen extends Screen {
   final StringBuffer _cmd = StringBuffer();
   final TypingBuffer _input = TypingBuffer();
 
+  static bool hasNumArgs(List<String> args, int n) {
+    if (args.length == n + 1) {
+      return true;
+    }
+
+    Log.warn(_logLabel,
+        '${args.first} expects ${n} arg${(n != 1) ? 's' : ''}; got ${args.length - 1} instead');
+    return false;
+  }
+
+  static bool intTest(String val, String obj, {bool throwErr = false}) {
+    if (int.tryParse(val) != null) {
+      return true;
+    }
+
+    if (throwErr) {
+      throw Exception('${_logLabel} Error: invalid ${obj}: ${val} (expected int)');
+    } else {
+      Log.warn(_logLabel, 'invalid ${obj}: ${val} (expected int)');
+    }
+    return false;
+  }
+
+  static bool argTest(bool Function(String) test, String val, String msg, {bool throwErr = false}) {
+    if (test(val)) {
+      return true;
+    }
+
+    if (throwErr) {
+      throw Exception('${_logLabel} Error: ${msg}');
+    } else {
+      Log.warn(_logLabel, msg);
+    }
+    return false;
+  }
+
   ScreenEvent parseCommand(StringBuffer commandBuffer, GameData state) {
     String cmd = commandBuffer.toString();
 
@@ -24,20 +60,29 @@ class CommandScreen extends Screen {
       case 'debrief':
         return ScreenEvent.debrief;
       case 'level':
-        if (parts.length != 2) {
-          Log.warn(
-              _logLabel, '.. expected one arg for level, got ${parts.length - 1} values instead');
+        if (!hasNumArgs(parts, 1)) {
           break;
         }
-        if (int.tryParse(parts[1]) != null) {
-          state.cmdArgs.add(parts[1]);
-          return ScreenEvent.setLevel;
-        } else {
-          Log.warn(_logLabel, '.. invalid level: ${parts[1]} (expected int)');
+        if (!intTest(parts[1], parts.first)) {
           break;
         }
+        state.cmdArgs.add(parts[1]);
+        return ScreenEvent.setLevel;
       case 'regen':
         return ScreenEvent.regen;
+      case 'seed':
+        if (!hasNumArgs(parts, 2)) {
+          break;
+        }
+        if (!intTest(parts[1], parts.first)) {
+          break;
+        }
+        if (!intTest(parts[2], 'level')) {
+          break;
+        }
+        state.reseed(int.parse(parts[1]));
+        state.cmdArgs.add(parts[2]);
+        return ScreenEvent.setLevel;
       case 'title':
         return ScreenEvent.title;
     }
