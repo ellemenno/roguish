@@ -10,7 +10,7 @@ class CommandScreen extends Screen {
   final StringBuffer _cmd = StringBuffer();
   final TypingBuffer _input = TypingBuffer();
 
-  static bool hasNumArgs(List<String> args, int n) {
+  static bool _hasNumArgs(List<String> args, int n) {
     if (args.length == n + 1) {
       return true;
     }
@@ -20,7 +20,7 @@ class CommandScreen extends Screen {
     return false;
   }
 
-  static bool intTest(String val, String obj, {bool throwErr = false}) {
+  static bool _intTest(String val, String obj, {bool throwErr = false}) {
     if (int.tryParse(val) != null) {
       return true;
     }
@@ -33,7 +33,7 @@ class CommandScreen extends Screen {
     return false;
   }
 
-  static bool argTest(bool Function(String) test, String val, String msg, {bool throwErr = false}) {
+  static bool _argTest(bool Function(String) test, String val, String msg, {bool throwErr = false}) {
     if (test(val)) {
       return true;
     }
@@ -46,11 +46,11 @@ class CommandScreen extends Screen {
     return false;
   }
 
-  ScreenEvent parseCommand(StringBuffer commandBuffer, GameData state) {
+  ScreenEvent _parseCommand(StringBuffer commandBuffer, GameData state) {
     String cmd = commandBuffer.toString();
 
     List<String> parts = cmd.split(' ');
-    Log.debug(_logLabel, 'parseCommand() ${parts}');
+    Log.debug(_logLabel, '_parseCommand() ${parts}');
     state.cmdArgs.clear();
 
     switch (parts.first) {
@@ -60,10 +60,10 @@ class CommandScreen extends Screen {
       case 'debrief':
         return ScreenEvent.debrief;
       case 'level':
-        if (!hasNumArgs(parts, 1)) {
+        if (!_hasNumArgs(parts, 1)) {
           break;
         }
-        if (!intTest(parts[1], parts.first)) {
+        if (!_intTest(parts[1], parts.first)) {
           break;
         }
         state.cmdArgs.add(parts[1]);
@@ -71,13 +71,13 @@ class CommandScreen extends Screen {
       case 'regen':
         return ScreenEvent.regen;
       case 'seed':
-        if (!hasNumArgs(parts, 2)) {
+        if (!_hasNumArgs(parts, 2)) {
           break;
         }
-        if (!intTest(parts[1], parts.first)) {
+        if (!_intTest(parts[1], parts.first)) {
           break;
         }
-        if (!intTest(parts[2], 'level')) {
+        if (!_intTest(parts[2], 'level')) {
           break;
         }
         state.reseed(int.parse(parts[1]));
@@ -98,7 +98,7 @@ class CommandScreen extends Screen {
     } else if (term.isEnter(seq)) {
       _input.toStringBuffer(_cmd, withFormatting: false);
       _input.clear();
-      todo = parseCommand(_cmd, state);
+      todo = _parseCommand(_cmd, state);
     } else if (config.isCursorLeft(hash)) {
       _input.cursorLeft();
     } else if (config.isCursorRight(hash)) {
