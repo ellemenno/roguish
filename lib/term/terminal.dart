@@ -301,7 +301,7 @@ void showCursor() {
 /// The provided stringbuffer is cleared and filled with ANSI codes to reset styles,
 /// clear the screen, and position the cursor in the top left corner.
 /// Optionally, scrollback history can be cleared, and the cursor can be hidden.
-/// The provided stringbuffer is left empty.
+/// The provided stringbuffer is empty when this command completes.
 void clear(StringBuffer sb, {hideCursor = false, clearHistory = false}) {
   sb.clear();
   ansi.reset(sb);
@@ -324,7 +324,7 @@ void clear(StringBuffer sb, {hideCursor = false, clearHistory = false}) {
 /// [xPos] sets the horizontal position of the message.
 /// [yPos] sets the vertical position of the message.
 /// [cll] if `true`, clears the row before printing.
-void placeMessage(StringBuffer sb, String msg, {int xPos = 0, int yPos = 0, bool cll = false}) {
+void placeMessage(StringBuffer sb, String msg, {int xPos = 1, int yPos = 1, bool cll = false}) {
   //sb.clear();
   ansi.xy(sb, xPos, yPos);
   if (cll) {

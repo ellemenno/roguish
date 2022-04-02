@@ -32,6 +32,8 @@ class TypingBuffer {
   }
 
   /// Removes one character to the left of the cursor.
+  ///
+  /// If the cursor is at the start of the text, calling this has no effect.
   void backspace() {
     if (_cursor == 0) {
       return;
@@ -42,6 +44,8 @@ class TypingBuffer {
   }
 
   /// Removes one character to the right of the cursor.
+  ///
+  /// If the cursor is at the end of the text, calling this has no effect.
   void delete() {
     if (_cursor == _chars.length) {
       return;

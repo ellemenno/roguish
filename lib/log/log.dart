@@ -28,7 +28,7 @@ enum LogLevel {
   /// adds messages that track happy path execution.
   info,
 
-  /// adds messages that track program state.
+  /// adds messages that track program state details.
   debug,
 }
 
@@ -59,7 +59,7 @@ class FilePrinter extends Printer {
 
 /// Provides a terminal recording function for use by [Log].
 class StderrPrinter extends Printer {
-  /// Records a formatted log message as a line entry to the stderr stream of the terminal.
+  /// Records a formatted log message as a line entry to the dart:io stderr stream of the terminal.
   ///
   /// Message formatting is handled by [Log.formatter].
   @override

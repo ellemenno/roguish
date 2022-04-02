@@ -89,7 +89,7 @@ void reset(StringBuffer sb) {
   sb.write(plain);
 }
 
-/// Prints an ansi code into [sb] to position the terminal cursor at row [x], column [y].
+/// Prints an ansi code into [sb] to position the terminal cursor at column [x] of line [y].
 ///
 /// [x] and [y] are 1-based, up to `dart:io.Stdout.terminalColumns` and `dart:io.Stdout.terminalLines`.
 void xy(StringBuffer sb, int x, int y) {
@@ -104,7 +104,7 @@ void xy(StringBuffer sb, int x, int y) {
 /// - `0` from cursor to start (0,0)
 /// - `1` from cursor to end (terminalColumns, terminalLines)
 /// - `2` entire screen
-/// - `3` entire screen and scrollback buffer (not supported in all terminals, see [ris] for an alternative)
+/// - `3` entire screen and scrollback buffer (not supported in all terminals, see [clh] and [ris] for an alternative)
 void cls(StringBuffer sb, {int n = 2}) {
   // clear screen
   // \e[nJ, n=0 cursor to start, n=1 cursor to end, n=2 all
