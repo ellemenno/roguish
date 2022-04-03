@@ -113,7 +113,7 @@ void cls(StringBuffer sb, {int n = 2}) {
 
 /// Prints an ansi code into [sb] to clear the terminal screen and history (scrollback buffer).
 ///
-/// This will unhide the cursor if it was previously hidden. To re-hide the cursor, set [hideCursor] `true`
+/// This will unhide the cursor if it was previously hidden. To re-hide the cursor, provide [hideCursor] as `true`
 void clh(StringBuffer sb, {hideCursor = false}) {
   sb.write(ris);
   if (hideCursor) {

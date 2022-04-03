@@ -307,7 +307,7 @@ void clear(StringBuffer sb, {hideCursor = false, clearHistory = false}) {
   ansi.reset(sb);
   ansi.xy(sb, 1, 1);
   if (clearHistory) {
-    sb.write(ansi.ris);
+    ansi.clh(sb);
   } else {
     ansi.cls(sb, n: 2);
   }
