@@ -231,6 +231,9 @@ void onData(List<int> codes) {
   if (!commandBarOpen && config.isCommandBar(codeHash)) {
     onShowCommandBar();
   } else if (config.isDebugPanel(codeHash)) {
+    if (debugPanelOpen) {
+      debugPanel.blank();
+    }
     debugPanelOpen = !debugPanelOpen;
   } else if (!paused && config.isPause(codeHash)) {
     onPause();
