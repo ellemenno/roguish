@@ -8,10 +8,10 @@ import 'package:rougish/term/terminal.dart' as term;
 import 'package:rougish/screen/screen.dart';
 
 const logLabel = 'rougish';
-const fps = 24;
-const mspf = Duration(milliseconds: 1000 ~/ fps);
+final stopwatch = Stopwatch();
 final List<Screen> screenStack = [];
 final Screen test = Screen.test();
+final Screen debugPanel = Screen.debug();
 final Screen command = Screen.command();
 final Screen pause = Screen.pause();
 final Screen title = Screen.title();
@@ -26,6 +26,7 @@ late Screen currentScreen;
 late StreamSubscription<ScreenEvent> screenListener;
 bool paused = false;
 bool commandBarOpen = false;
+bool debugPanelOpen = false;
 
 void pushScreen(Screen screen) {
   if (screenStack.isNotEmpty) {
@@ -70,14 +71,14 @@ void redrawScreens() {
     // dart lists iterate from first added to last added, which gives us bottom to top of stack
     screen.draw(state);
   }
+  if (debugPanelOpen) {
+    debugPanel.draw(state);
+  }
+
   // draw buffer to screen
   term.printBuffer(screenBuffer);
   // clear buffer for next frame
   screenBuffer.clear();
-}
-
-void showCodes(List<int> codes) {
-  Log.debug(logLabel, () => term.codesToString(codes));
 }
 
 void onResize() {
@@ -175,11 +176,6 @@ void onQuit() {
   exit(0);
 }
 
-void onKeySequence(List<int> seq, String hash) {
-  Log.debug(logLabel, 'onKeySequence() ${hash}');
-  currentScreen.onKeySequence(seq, hash, state);
-}
-
 void onScreenEvent(ScreenEvent event) {
   Log.debug(logLabel, 'onScreenEvent() ${event.name}');
   if (commandBarOpen && event != ScreenEvent.hideCommandBar) {
@@ -229,21 +225,25 @@ void onData(List<int> codes) {
     return;
   }
 
-  showCodes(codes);
+  state.keyCodes = codes;
   String codeHash = term.codeHash(codes);
 
   if (!commandBarOpen && config.isCommandBar(codeHash)) {
     onShowCommandBar();
+  } else if (config.isDebugPanel(codeHash)) {
+    debugPanelOpen = !debugPanelOpen;
   } else if (!paused && config.isPause(codeHash)) {
     onPause();
   } else {
-    onKeySequence(codes, codeHash);
+    currentScreen.onKeySequence(codes, codeHash, state);
   }
 }
 
 void onFrame(Timer t) {
   redrawScreens();
   (Log.printer as BufferedFilePrinter).flush();
+  state.frameMs = stopwatch.elapsedMicroseconds;
+  stopwatch.reset();
 }
 
 void addSignalListeners() {
@@ -285,8 +285,8 @@ void main(List<String> arguments) {
     Log.warn(logLabel, 'listener zone exception: ${e}');
   });
 
-  //pushScreen(test);
+  stopwatch.start();
   pushScreen(title);
-  frameTimer = Timer.periodic(mspf, onFrame);
+  frameTimer = Timer.periodic(Duration(milliseconds: 1000 ~/ state.fps), onFrame);
   (Log.printer as BufferedFilePrinter).flush();
 }

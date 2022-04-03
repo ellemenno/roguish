@@ -4,6 +4,7 @@ import 'package:rougish/term/terminal.dart' as term;
 export 'src/from_file.dart' show fromFile;
 
 String _keyCommandBarHash = '';
+String _keyDebugPanelHash = '';
 String _keyCursorLeftHash = '';
 String _keyCursorRightHash = '';
 String _keyPauseHash = '';
@@ -48,6 +49,10 @@ List<int> keyCommandBar(Map<String, String> conf, {defaultCodes = '0x20'}) {
   return toCodes(conf, 'key-command', defaultCodes);
 }
 
+List<int> keyDebugPanel(Map<String, String> conf, {defaultCodes = '0x7e'}) {
+  return toCodes(conf, 'key-debug', defaultCodes);
+}
+
 List<int> keyCursorLeft(Map<String, String> conf, {defaultCodes = '0x1b,0x5b,0x44'}) {
   return toCodes(conf, 'key-cursor_left', defaultCodes);
 }
@@ -78,6 +83,7 @@ List<int> keyRight(Map<String, String> conf, {player = 1, defaultCodes = '0x1b,0
 
 void setKeys(Map<String, String> conf) {
   _keyCommandBarHash = term.codeHash(keyCommandBar(conf));
+  _keyDebugPanelHash = term.codeHash(keyDebugPanel(conf));
   _keyCursorLeftHash = term.codeHash(keyCursorLeft(conf));
   _keyCursorRightHash = term.codeHash(keyCursorRight(conf));
   _keyPauseHash = term.codeHash(keyPause(conf));
@@ -89,6 +95,10 @@ void setKeys(Map<String, String> conf) {
 
 bool isCommandBar(String hash) {
   return (hash == _keyCommandBarHash);
+}
+
+bool isDebugPanel(String hash) {
+  return (hash == _keyDebugPanelHash);
 }
 
 bool isCursorLeft(String hash) {

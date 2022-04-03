@@ -5,6 +5,7 @@ import 'src/creature.dart';
 import 'src/room.dart';
 
 class GameData {
+  final fps = 24;
   final List<Creature> players = [];
   final List<Room> rooms = [];
   final List<List<Cell>> levelMap = [];
@@ -14,6 +15,9 @@ class GameData {
 
   final Map<String, String> _conf;
   Map<String, String> get conf => _conf;
+
+  int _seed;
+  int get seed => _seed;
 
   Random _prng;
   Random get prng => _prng;
@@ -27,7 +31,13 @@ class GameData {
   int herbs = 0;
   int coins = 0;
 
-  void reseed(int seed) => _prng = Random(seed);
+  List<int> keyCodes = [];
+  int frameMs = 0;
 
-  GameData(this._conf, int seed) : _prng = Random(seed);
+  void reseed(int seed) {
+    _seed = seed;
+    _prng = Random(_seed);
+  }
+
+  GameData(this._conf, this._seed) : _prng = Random(_seed);
 }

@@ -4,6 +4,7 @@ import 'package:rougish/game/game_data.dart';
 import 'package:rougish/term/ansi.dart' as ansi;
 
 import 'src/command_screen.dart';
+import 'src/debug_screen.dart';
 import 'src/debrief_screen.dart';
 import 'src/level_screen.dart';
 import 'src/pause_screen.dart';
@@ -54,6 +55,9 @@ abstract class Screen {
 
   factory Screen.test() {
     return TestScreen();
+  }
+  factory Screen.debug() {
+    return DebugScreen();
   }
   factory Screen.command() {
     return CommandScreen();
