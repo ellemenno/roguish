@@ -33,7 +33,8 @@ class CommandScreen extends Screen {
     return false;
   }
 
-  static bool _argTest(bool Function(String) test, String val, String msg, {bool throwErr = false}) {
+  static bool _argTest(bool Function(String) test, String val, String msg,
+      {bool throwErr = false}) {
     if (test(val)) {
       return true;
     }
@@ -125,6 +126,11 @@ class CommandScreen extends Screen {
   @override
   void draw(GameData state) {
     _input.toStringBuffer(_cmd);
-    term.placeMessage(screenBuffer, '> ${_cmd}', xPos: 0, yPos: 0, cll: true);
+    term.placeMessage(screenBuffer, '> ${_cmd}', xPos: 1, yPos: 1, cll: true);
+  }
+
+  @override
+  void blank() {
+    term.placeMessage(screenBuffer, ' ', xPos: 1, yPos: 1, cll: true);
   }
 }

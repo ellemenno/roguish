@@ -42,7 +42,6 @@ class PauseScreen extends Screen {
     term.centerMessage(sb, ' |${_dlg[5]}| ', yOffset: 2);
     term.centerMessage(sb, ' |${_dlg[6]}| ', yOffset: 3);
     term.centerMessage(sb, ' \'${_dlg[7]}\' ', yOffset: 4);
-    term.printBuffer(sb);
   }
 
   @override
@@ -61,7 +60,6 @@ class PauseScreen extends Screen {
     }
 
     if (todo != ScreenEvent.nothing) {
-      term.centerMessage(screenBuffer, 'todo: \'${todo}\'', yOffset: 5);
       _curOption = 0;
       broadcast(todo);
     }

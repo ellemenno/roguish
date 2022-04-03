@@ -17,6 +17,8 @@ class LevelScreen extends Screen {
   }
 
   void _drawMap(StringBuffer screenBuffer, GameData state) {
+    ansi.xy(screenBuffer, 1, 1);
+    ansi.cll(screenBuffer);
     ansi.xy(screenBuffer, 1, 2);
     map.LevelManager.render(screenBuffer, state.levelMap);
   }

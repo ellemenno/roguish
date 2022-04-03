@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:rougish/game/game_data.dart';
+import 'package:rougish/term/ansi.dart' as ansi;
 
 import 'src/command_screen.dart';
 import 'src/debrief_screen.dart';
@@ -26,6 +27,11 @@ enum ScreenEvent {
 abstract class Screen {
   static final StringBuffer _sb = StringBuffer();
 
+  static void blankScreen() {
+    ansi.xy(_sb, 1, 1);
+    ansi.clh(_sb, hideCursor: true);
+  }
+
   StringBuffer get screenBuffer => _sb; // all screens share/reuse the same temp string buffer
 
   final StreamController<ScreenEvent> _eventBroadcaster = StreamController<ScreenEvent>.broadcast();
@@ -39,7 +45,10 @@ abstract class Screen {
   }
 
   void onKeySequence(List<int> seq, String hash, GameData state);
+
   void draw(GameData state);
+
+  void blank() => blankScreen();
 
   Screen();
 

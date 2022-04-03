@@ -40,19 +40,38 @@ abstract class Printer {
   void print(String message);
 }
 
-/// Provides a file recording function for use by [Log].
-class FilePrinter extends Printer {
+/// Provides a buffered file recording function for use by [Log].
+class BufferedFilePrinter extends Printer {
   final File _logFile;
+  final StringBuffer _buffer = StringBuffer();
 
-  /// Records a formatted log message as a line entry in the file specified in the constructor.
+  /// Returns the length (number of characters) of the content that has been accumulated so far.
+  int get bufferLength => _buffer.length;
+
+  /// Records a formatted log message as a line entry in the log buffer. Use [flush] to print to file.
   ///
   /// Message formatting is handled by [Log.formatter].
   @override
   void print(String message) {
-    _logFile.writeAsStringSync("${message}\n", mode: FileMode.append);
+    _buffer.write("${message}\n");
   }
 
-  FilePrinter(String fileName) : _logFile = File(fileName) {
+  /// Clears the contents of the buffer. Note that [flush] also clears afer write.
+  void clear() {
+    if (_buffer.length > 0) {
+      _buffer.clear();
+    }
+  }
+
+  /// Writes the contents of the buffer to the file specified in the constructor, and clears the buffer.
+  void flush() {
+    if (_buffer.length > 0) {
+      _logFile.writeAsStringSync(_buffer.toString(), mode: FileMode.append);
+      _buffer.clear();
+    }
+  }
+
+  BufferedFilePrinter(String fileName) : _logFile = File(fileName) {
     _logFile.writeAsStringSync('');
   }
 }
@@ -140,9 +159,9 @@ class Log {
   /// by setting the value of this field.
   static Printer printer = StderrPrinter();
 
-  /// Sets [Log.printer] to a [FilePrinter] instance that writes to the filename given in [logFile].
-  static void toFile({String logFile = 'log.txt'}) {
-    printer = FilePrinter(logFile);
+  /// Sets [Log.printer] to a [BufferedFilePrinter] instance that logs to a memory buffer until [BufferedFilePrinter.flush] triggers writing to the filename given in [logFile].
+  static void toBufferedFile({String logFile = 'log.txt'}) {
+    printer = BufferedFilePrinter(logFile);
   }
 
   /// Submit a message at `debug` level verbosity (the highest verbosity level).

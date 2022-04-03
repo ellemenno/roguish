@@ -111,6 +111,16 @@ void cls(StringBuffer sb, {int n = 2}) {
   sb.write('${csi}${n}J');
 }
 
+/// Prints an ansi code into [sb] to clear the terminal screen and history (scrollback buffer).
+///
+/// This will unhide the cursor if it was previously hidden. To re-hide the cursor, set [hideCursor] `true`
+void clh(StringBuffer sb, {hideCursor = false}) {
+  sb.write(ris);
+  if (hideCursor) {
+    sb.write(hide);
+  }
+}
+
 /// Prints an ansi code into [sb] to clear some or all of the current line.
 ///
 /// The portion of the line to be cleared is controlled by [n]:

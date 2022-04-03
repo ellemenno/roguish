@@ -8,6 +8,8 @@ import 'package:rougish/term/terminal.dart' as term;
 import 'package:rougish/screen/screen.dart';
 
 const logLabel = 'rougish';
+const fps = 24;
+const mspf = Duration(milliseconds: 1000 ~/ fps);
 final List<Screen> screenStack = [];
 final Screen test = Screen.test();
 final Screen command = Screen.command();
@@ -17,6 +19,7 @@ final Screen setup = Screen.setup();
 final Screen level = Screen.level();
 final Screen debrief = Screen.debrief();
 final StringBuffer screenBuffer = title.screenBuffer;
+late final Timer frameTimer;
 late final StreamSubscription<List<int>> termListener;
 late final GameData state;
 late Screen currentScreen;
@@ -32,7 +35,6 @@ void pushScreen(Screen screen) {
   currentScreen = screenStack.last;
   Log.info(logLabel, 'pushScreen() added ${screen.runtimeType} as new current screen');
   screenListener = currentScreen.listen(onScreenEvent);
-  redrawScreens();
 }
 
 Screen popScreen() {
@@ -41,12 +43,12 @@ Screen popScreen() {
   }
   screenListener.cancel();
   Screen screen = screenStack.removeLast();
+  screen.blank();
   if (screenStack.isNotEmpty) {
     currentScreen = screenStack.last;
     screenListener = currentScreen.listen(onScreenEvent);
-    Log.info(logLabel,
+    Log.debug(logLabel,
         'popScreen() removed ${screen.runtimeType}; current screen is ${currentScreen.runtimeType}');
-    redrawScreens();
   }
   return screen;
 }
@@ -59,16 +61,19 @@ void popAllScreens() {
   while (screenStack.isNotEmpty) {
     screenStack.removeLast();
   }
+  Screen.blankScreen();
 }
 
 void redrawScreens() {
-  Log.debug(logLabel, 'redrawScreens() redrawing ${screenStack.length} screens from bottom up..');
-  term.clear(screenBuffer, hideCursor: true, clearHistory: true);
-  // dart lists iterate from first added to last added, which gives us bottom to top of stack
+  // update screen buffer
   for (final screen in screenStack) {
+    // dart lists iterate from first added to last added, which gives us bottom to top of stack
     screen.draw(state);
   }
+  // draw buffer to screen
   term.printBuffer(screenBuffer);
+  // clear buffer for next frame
+  screenBuffer.clear();
 }
 
 void showCodes(List<int> codes) {
@@ -76,8 +81,7 @@ void showCodes(List<int> codes) {
 }
 
 void onResize() {
-  Log.info(logLabel, 'onResize() call for redraw at new size..');
-  redrawScreens();
+  Log.info(logLabel, 'onResize() ..no-op');
 }
 
 void onShowCommandBar() {
@@ -146,7 +150,6 @@ void onSetLevel() {
   state.level = levelNum;
   if (currentScreen == level) {
     state.newLevel = true;
-    redrawScreens();
   }
 }
 
@@ -159,11 +162,11 @@ void onLevelRegen() {
   Log.info(logLabel, '.. seed = ${prngSeed}');
   state.reseed(prngSeed);
   state.newLevel = true;
-  redrawScreens();
 }
 
 void onQuit() {
   Log.info(logLabel, 'onQuit() quitting..');
+  frameTimer.cancel();
   screenListener.cancel();
   termListener.cancel();
   term.clear(screenBuffer, hideCursor: true, clearHistory: true);
@@ -175,7 +178,6 @@ void onQuit() {
 void onKeySequence(List<int> seq, String hash) {
   Log.debug(logLabel, 'onKeySequence() ${hash}');
   currentScreen.onKeySequence(seq, hash, state);
-  redrawScreens();
 }
 
 void onScreenEvent(ScreenEvent event) {
@@ -239,6 +241,11 @@ void onData(List<int> codes) {
   }
 }
 
+void onFrame(Timer t) {
+  redrawScreens();
+  (Log.printer as BufferedFilePrinter).flush();
+}
+
 void addSignalListeners() {
   try {
     ProcessSignal.sigint
@@ -257,11 +264,13 @@ void addSignalListeners() {
 }
 
 void main(List<String> arguments) {
+  term.clear(screenBuffer, hideCursor: true, clearHistory: true);
+
   Map<String, String> conf = config.fromFile('bin/rougish.conf');
   int prngSeed = config.prngSeed(conf);
   state = GameData(conf, prngSeed);
 
-  Log.toFile();
+  Log.toBufferedFile();
   Log.level = config.logLevel(state.conf);
   Log.info(logLabel, 'app startup. logging initialized at ${Log.level}. args = ${arguments}');
   Log.info(logLabel, 'seed = ${prngSeed}');
@@ -278,5 +287,6 @@ void main(List<String> arguments) {
 
   //pushScreen(test);
   pushScreen(title);
-  redrawScreens();
+  frameTimer = Timer.periodic(mspf, onFrame);
+  (Log.printer as BufferedFilePrinter).flush();
 }
