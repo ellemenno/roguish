@@ -6,6 +6,9 @@ import 'dart:io';
 
 import 'package:rougish/term/ansi.dart' as ansi;
 
+int _terminalColumns = -1;
+int _terminalLines = -1;
+
 /// start of heading
 const sh = 0x01;
 
@@ -86,6 +89,18 @@ bool isPrintableAscii(List<int> seq) {
     return false;
   }
   return true;
+}
+
+/// Provide a printable symbol for all ASCII code sequences from `0x20` to `0x7e`.
+/// (this excludes printable runes like emoji).
+String asciiToString(int code) {
+  int picture = code; // assume printable string; can be used as is
+  if (code == 0x7F) {
+    picture = 0x2421; // unicode control picture for delete (U+2421)
+  } else if (code <= printableLo) {
+    picture = 0x2400 + code; // replace with matching control picture (U+2400 - U+2420)
+  }
+  return String.fromCharCode(picture);
 }
 
 /// Determine whether a given sequence of codes represents the Backspace key.
@@ -273,8 +288,14 @@ SeqKey seqKeyFromCodes(List<int> codes) {
 }
 
 /// Retrieve terminal width (columns), and height (rows) as a two-element list.
-List<int> size() {
-  return [stderr.terminalColumns, stderr.terminalLines];
+///
+/// Unless [useCache] is set to `false`, dimensions will be provided from cached values.
+List<int> size({bool useCache = true}) {
+  if (useCache == false || _terminalColumns < 0 || _terminalLines < 0) {
+    _terminalColumns = stderr.terminalColumns;
+    _terminalLines = stderr.terminalLines;
+  }
+  return [_terminalColumns, _terminalLines];
 }
 
 /// Subscribe a listener function for key sequences emitted from the terminal.
