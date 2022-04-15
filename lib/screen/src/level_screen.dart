@@ -20,8 +20,7 @@ class LevelScreen extends Screen {
     state.newLevel = false;
     _mapSize();
     int cols = _dim[0], rows = _dim[1];
-    Log.debug(
-        _logLabel, 'draw() new level - level: ${state.level}, rows: ${rows}, cols: ${cols}');
+    Log.debug(_logLabel, 'draw() new level - level: ${state.level}, rows: ${rows}, cols: ${cols}');
     // if new dimensions:  dispose, allocate, generate
     // if empty:           ..       allocate, generate
     // if same dimensions: ..       ..        generate (will handle reset internally)

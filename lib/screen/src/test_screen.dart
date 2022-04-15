@@ -18,7 +18,7 @@ class TestScreen extends Screen {
   }
 
   void _paintSymbols(StringBuffer sb) {
-    term.placeMessage(sb, 'font check for symbol coverage', xPos:0, yPos: 2);
+    term.placeMessage(sb, 'font check for symbol coverage', xPos: 0, yPos: 2);
     term.placeMessage(sb, '      ui: ', xPos: 0, yPos: 4);
     for (var t in map.UIType.values) {
       sb.write(map.uiSymbol(t));
@@ -77,13 +77,12 @@ class TestScreen extends Screen {
     int pauseCode = int.parse(state.conf['key-pause']!);
     int commandCode = int.parse(state.conf['key-command']!);
     term.centerMessage(
-      screenBuffer,
-      [
-        'listening for keys.',
-        '${term.asciiToString(pauseCode)} for menu.',
-        '${term.asciiToString(commandCode)} for command bar.',
-      ].join(' '),
-      yOffset: 2
-    );
+        screenBuffer,
+        [
+          'listening for keys.',
+          '${term.asciiToString(pauseCode)} for menu.',
+          '${term.asciiToString(commandCode)} for command bar.',
+        ].join(' '),
+        yOffset: 2);
   }
 }

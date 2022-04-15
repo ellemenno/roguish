@@ -12,21 +12,21 @@ class Cell {
 
   Creature _occupant = Creature.noCreature;
   Creature get occupant => _occupant;
-  void set occupant(Creature creature) {
+  set occupant(Creature creature) {
     _occupant = creature;
     _creatureSymbol = creatureSymbol(_occupant.type);
   }
 
   Item _contents = Item.noItem;
   Item get contents => _contents;
-  void set contents(Item item) {
+  set contents(Item item) {
     _contents = item;
     _itemSymbol = itemSymbol(_contents.type);
   }
 
   CellType _type = CellType.unexplored;
   CellType get type => _type;
-  void set type(CellType creature) {
+  set type(CellType creature) {
     _type = creature;
     _cellSymbol = cellSymbol(_type);
   }
