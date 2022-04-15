@@ -32,7 +32,7 @@ class GameData {
   int coins = 0;
 
   List<int> keyCodes = [];
-  int frameMs = 0;
+  int frameMicroseconds = 0;
 
   void reseed(int seed) {
     _seed = seed;

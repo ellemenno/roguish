@@ -245,7 +245,7 @@ void onData(List<int> codes) {
 void onFrame(Timer t) {
   redrawScreens();
   (Log.printer as BufferedFilePrinter).flush();
-  state.frameMs = stopwatch.elapsedMicroseconds;
+  state.frameMicroseconds = stopwatch.elapsedMicroseconds;
   stopwatch.reset();
 }
 
