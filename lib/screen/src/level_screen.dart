@@ -8,12 +8,32 @@ import '../screen.dart';
 
 class LevelScreen extends Screen {
   static const _logLabel = 'LevelScreen';
+  final _dim = List<int>.filled(2, 0);
 
-  List<int> _mapSize() {
-    List<int> dim = term.size();
+  void _mapSize() {
+    term.size(_dim, useCache: false);
     // leave a row at the top and bottom for the ui
-    dim[1] -= 2;
-    return dim;
+    _dim[1] -= 2;
+  }
+
+  void _newLevel(GameData state) {
+    state.newLevel = false;
+    _mapSize();
+    int cols = _dim[0], rows = _dim[1];
+    Log.debug(
+        _logLabel, 'draw() new level - level: ${state.level}, rows: ${rows}, cols: ${cols}');
+    // if new dimensions:  dispose, allocate, generate
+    // if empty:           ..       allocate, generate
+    // if same dimensions: ..       ..        generate (will handle reset internally)
+    if (rows != state.levelMap.length || cols != state.levelMap.first.length) {
+      Log.debug(_logLabel, 'draw() new dimensions require map reallocation');
+      if (state.levelMap.isNotEmpty) {
+        map.LevelGenerator.dispose(state.levelMap, state.rooms, state.players);
+      }
+      map.LevelGenerator.allocate(state.levelMap, cols, rows);
+    }
+    map.LevelGenerator.generate(
+        state.levelMap, state.rooms, state.players, state.prng, state.level, state.levelMax);
   }
 
   void _drawMap(StringBuffer screenBuffer, GameData state) {
@@ -58,23 +78,7 @@ class LevelScreen extends Screen {
   @override
   void draw(GameData state) {
     if (state.newLevel) {
-      state.newLevel = false;
-      List<int> dim = _mapSize();
-      int cols = dim[0], rows = dim[1];
-      Log.debug(
-          _logLabel, 'draw() new level - level: ${state.level}, rows: ${rows}, cols: ${cols}');
-      // if new dimensions:  dispose, allocate, generate
-      // if empty:           ..       allocate, generate
-      // if same dimensions: ..       ..        generate (will handle reset internally)
-      if (rows != state.levelMap.length || cols != state.levelMap.first.length) {
-        Log.debug(_logLabel, 'draw() new dimensions require map reallocation');
-        if (state.levelMap.isNotEmpty) {
-          map.LevelGenerator.dispose(state.levelMap, state.rooms, state.players);
-        }
-        map.LevelGenerator.allocate(state.levelMap, cols, rows);
-      }
-      map.LevelGenerator.generate(
-          state.levelMap, state.rooms, state.players, state.prng, state.level, state.levelMax);
+      _newLevel(state);
     }
     _drawMap(screenBuffer, state);
     _drawUI(screenBuffer, state);

@@ -6,6 +6,7 @@ import 'dart:io';
 
 import 'package:rougish/term/ansi.dart' as ansi;
 
+final _dim = List<int>.filled(2, 0);
 int _terminalColumns = -1;
 int _terminalLines = -1;
 
@@ -287,15 +288,16 @@ SeqKey seqKeyFromCodes(List<int> codes) {
   return SeqKey.none;
 }
 
-/// Retrieve terminal width (columns), and height (rows) as a two-element list.
+/// Retrieve terminal width (columns), and height (rows) in a two-element list.
 ///
 /// Unless [useCache] is set to `false`, dimensions will be provided from cached values.
-List<int> size({bool useCache = true}) {
+void size(List<int> dim, {bool useCache = true}) {
   if (useCache == false || _terminalColumns < 0 || _terminalLines < 0) {
     _terminalColumns = stderr.terminalColumns;
     _terminalLines = stderr.terminalLines;
   }
-  return [_terminalColumns, _terminalLines];
+  dim[0] = _terminalColumns;
+  dim[1] = _terminalLines;
 }
 
 /// Subscribe a listener function for key sequences emitted from the terminal.
@@ -365,9 +367,9 @@ void placeMessage(StringBuffer sb, String msg, {int xPos = 1, int yPos = 1, bool
 /// [cll] if `true`, clears the row before printing.
 void placeMessageRelative(StringBuffer sb, String msg,
     {int xPercent = 0, int yPercent = 0, int xOffset = 0, int yOffset = 0, bool cll = false}) {
-  List<int> dim = size();
-  int x = (dim[0] * xPercent / 100).floor() + xOffset;
-  int y = (dim[1] * yPercent / 100).floor() + yOffset;
+  size(_dim);
+  int x = (_dim[0] * xPercent / 100).floor() + xOffset;
+  int y = (_dim[1] * yPercent / 100).floor() + yOffset;
   placeMessage(sb, msg, xPos: x, yPos: y, cll: cll);
 }
 
@@ -380,8 +382,8 @@ void placeMessageRelative(StringBuffer sb, String msg,
 /// [cll] if `true`, clears the row before printing.
 void centerMessage(StringBuffer sb, String msg,
     {int xOffset = 0, int yOffset = 0, int msgOffset = 0, bool cll = false}) {
-  List<int> dim = size();
-  int x = (dim[0] / 2).floor() - ((msg.length + msgOffset) / 2).floor() + xOffset;
-  int y = (dim[1] / 2).floor() + yOffset;
+  size(_dim);
+  int x = (_dim[0] / 2).floor() - ((msg.length + msgOffset) / 2).floor() + xOffset;
+  int y = (_dim[1] / 2).floor() + yOffset;
   placeMessage(sb, msg, xPos: x, yPos: y, cll: cll);
 }

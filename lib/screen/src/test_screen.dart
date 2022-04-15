@@ -5,10 +5,11 @@ import '../screen.dart';
 
 class TestScreen extends Screen {
   final StringBuffer _charSeq = StringBuffer();
+  final _dim = List<int>.filled(2, 0);
 
   void _announceSize(StringBuffer sb) {
-    List<int> dim = term.size();
-    term.centerMessage(sb, 'terminal is ${dim[0]} columns x ${dim[1]} lines', yOffset: 0);
+    term.size(_dim);
+    term.centerMessage(sb, 'terminal is ${_dim[0]} columns x ${_dim[1]} lines', yOffset: 0);
   }
 
   void _printInput(StringBuffer sb) {
