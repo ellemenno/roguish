@@ -5,19 +5,20 @@ import '../screen.dart';
 
 class TestScreen extends Screen {
   final StringBuffer _charSeq = StringBuffer();
-  final StringBuffer _nextMsg = StringBuffer();
 
   void _announceSize(StringBuffer sb) {
     List<int> dim = term.size();
-    term.centerMessage(sb, 'terminal is ${dim[0]} columns x ${dim[1]} lines', yOffset: -2);
+    term.centerMessage(sb, 'terminal is ${dim[0]} columns x ${dim[1]} lines', yOffset: 0);
   }
 
-  void _stateMessage(StringBuffer sb) {
-    term.centerMessage(sb, '${_nextMsg}', yOffset: -1);
+  void _printInput(StringBuffer sb) {
+    term.centerMessage(sb, '${_charSeq}', yOffset: 3);
+    _charSeq.clear();
   }
 
   void _paintSymbols(StringBuffer sb) {
-    term.placeMessage(sb, '      ui: ', xPos: 0, yPos: 3);
+    term.placeMessage(sb, 'font check for symbol coverage', xPos:0, yPos: 2);
+    term.placeMessage(sb, '      ui: ', xPos: 0, yPos: 4);
     for (var t in map.UIType.values) {
       sb.write(map.uiSymbol(t));
     }
@@ -63,25 +64,25 @@ class TestScreen extends Screen {
 
   @override
   void onKeySequence(List<int> seq, String hash, GameData state) {
-    if (!term.isPrintableAscii(seq)) {
-      return;
-    }
-
-    _charSeq.write(String.fromCharCode(seq[0]));
-    if (_charSeq.length > 3) {
-      _nextMsg.clear();
-      _nextMsg.write(_charSeq);
-      _charSeq.clear();
-    }
+    _charSeq.write(term.asciiToString(seq[0]));
   }
 
   @override
   void draw(GameData state) {
     _announceSize(screenBuffer);
-    _stateMessage(screenBuffer);
+    _printInput(screenBuffer);
     _paintSymbols(screenBuffer);
 
-    term.centerMessage(screenBuffer, 'listening for keys. ${state.conf['key-pause']} for menu.',
-        yOffset: 3);
+    int pauseCode = int.parse(state.conf['key-pause']!);
+    int commandCode = int.parse(state.conf['key-command']!);
+    term.centerMessage(
+      screenBuffer,
+      [
+        'listening for keys.',
+        '${term.asciiToString(pauseCode)} for menu.',
+        '${term.asciiToString(commandCode)} for command bar.',
+      ].join(' '),
+      yOffset: 2
+    );
   }
 }
