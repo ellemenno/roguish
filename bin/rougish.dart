@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:rougish/config/config.dart' as config;
@@ -22,10 +23,13 @@ final StringBuffer screenBuffer = title.screenBuffer;
 late final Timer frameTimer;
 late final StreamSubscription<List<int>> termListener;
 late final GameData state;
+late TimelineTask frameTask;
 late Screen currentScreen;
 late StreamSubscription<ScreenEvent> screenListener;
 int _logCountdown = 0;
 int _logFrames = 30;
+int _drawCountdown = 0;
+int _drawFrames = 6;
 bool paused = false;
 bool commandBarOpen = false;
 bool debugPanelOpen = false;
@@ -67,18 +71,28 @@ void popAllScreens() {
   Screen.blankScreen();
 }
 
-void redrawScreens() {
+void redrawScreens(TimelineTask trace) {
+  TimelineTask screenTask;
   // update screen buffer
   for (final screen in screenStack) {
     // dart lists iterate from first added to last added, which gives us bottom to top of stack
+    screenTask = TimelineTask(parent: trace);
+    screenTask.start('${screen}');
     screen.draw(state);
+    screenTask.finish();
   }
   if (debugPanelOpen) {
+    screenTask = TimelineTask(parent: trace);
+    screenTask.start('${debugPanel}');
     debugPanel.draw(state);
+    screenTask.finish();
   }
 
   // draw buffer to screen
+  screenTask = TimelineTask(parent: trace);
+  screenTask.start('printBuffer');
   term.printBuffer(screenBuffer);
+  screenTask.finish();
   // clear buffer for next frame
   screenBuffer.clear();
 }
@@ -245,14 +259,25 @@ void onData(List<int> codes) {
 }
 
 void onFrame(Timer t) {
+  frameTask = TimelineTask();
+  frameTask.start('rougish::onFrame');
+
   state.frameMicroseconds = stopwatch.elapsedMicroseconds;
   stopwatch.reset();
-  redrawScreens();
+
+  if (_drawCountdown == 0) {
+    redrawScreens(frameTask);
+    _drawCountdown = _drawFrames;
+  }
+  _drawCountdown--;
+
   if (_logCountdown == 0) {
     (Log.printer as BufferedFilePrinter).flush();
     _logCountdown = _logFrames;
   }
   _logCountdown--;
+
+  frameTask.finish();
 }
 
 void addSignalListeners() {
@@ -294,9 +319,12 @@ void main(List<String> arguments) {
     Log.warn(logLabel, 'listener zone exception: ${e}');
   });
 
-  stopwatch.start();
   pushScreen(title);
+
+  _drawFrames = state.fps ~/ 5;
+  _logFrames = state.fps ~/ 2;
   frameTimer = Timer.periodic(Duration(milliseconds: 1000 ~/ state.fps), onFrame);
-  _logFrames = (state.fps / 2).round();
+  stopwatch.start();
+
   (Log.printer as BufferedFilePrinter).flush();
 }

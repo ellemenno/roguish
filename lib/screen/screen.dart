@@ -41,6 +41,9 @@ abstract class Screen {
     return _eventBroadcaster.stream.listen(eventHandler);
   }
 
+  @override
+  String toString() => runtimeType.toString();
+
   void broadcast(ScreenEvent event) {
     _eventBroadcaster.add(event);
   }
