@@ -24,6 +24,8 @@ late final StreamSubscription<List<int>> termListener;
 late final GameData state;
 late Screen currentScreen;
 late StreamSubscription<ScreenEvent> screenListener;
+int _logCountdown = 0;
+int _logFrames = 30;
 bool paused = false;
 bool commandBarOpen = false;
 bool debugPanelOpen = false;
@@ -243,10 +245,14 @@ void onData(List<int> codes) {
 }
 
 void onFrame(Timer t) {
-  redrawScreens();
-  (Log.printer as BufferedFilePrinter).flush();
   state.frameMicroseconds = stopwatch.elapsedMicroseconds;
   stopwatch.reset();
+  redrawScreens();
+  if (_logCountdown == 0) {
+    (Log.printer as BufferedFilePrinter).flush();
+    _logCountdown = _logFrames;
+  }
+  _logCountdown--;
 }
 
 void addSignalListeners() {
@@ -291,5 +297,6 @@ void main(List<String> arguments) {
   stopwatch.start();
   pushScreen(title);
   frameTimer = Timer.periodic(Duration(milliseconds: 1000 ~/ state.fps), onFrame);
+  _logFrames = (state.fps / 2).round();
   (Log.printer as BufferedFilePrinter).flush();
 }

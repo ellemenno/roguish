@@ -14,21 +14,21 @@ class Cell {
   Creature get occupant => _occupant;
   set occupant(Creature creature) {
     _occupant = creature;
-    _creatureSymbol = creatureSymbol(_occupant.type);
+    _creatureSymbol = creatureSymbol(creature.type);
   }
 
   Item _contents = Item.noItem;
   Item get contents => _contents;
   set contents(Item item) {
     _contents = item;
-    _itemSymbol = itemSymbol(_contents.type);
+    _itemSymbol = itemSymbol(item.type);
   }
 
   CellType _type = CellType.unexplored;
   CellType get type => _type;
-  set type(CellType creature) {
-    _type = creature;
-    _cellSymbol = cellSymbol(_type);
+  set type(CellType cellType) {
+    _type = cellType;
+    _cellSymbol = cellSymbol(cellType);
   }
 
   @override
@@ -43,9 +43,9 @@ class Cell {
   }
 
   void reset() {
-    _occupant = Creature.noCreature;
-    _contents = Item.noItem;
-    _type = CellType.unexplored;
+    occupant = Creature.noCreature;
+    contents = Item.noItem;
+    type = CellType.unexplored;
   }
 
   Cell(this.col, this.row);
