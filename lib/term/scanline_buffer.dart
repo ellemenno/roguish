@@ -1,19 +1,24 @@
 
+import 'package:rougish/log/log.dart';
+
 import './ansi.dart' as ansi;
 import './terminal_printer.dart';
 
 
 class ScanlineBuffer {
+  static const _logLabel = 'ScanlineBuffer';
   static final _dim = List<int>.filled(2, 0);
   static final StringBuffer _buffer = StringBuffer();
   final TerminalPrinter _printer;
   late final List<StringBuffer> _lines;
+  late final List<int> _hashes;
   int _currentScanline = 0;
   int scanGap = 3;
 
   ScanlineBuffer(this._printer) {
     _printer.size(_dim, useCache: false);
     _lines = List.generate(_dim[1], (_) => StringBuffer(), growable: false);
+    _hashes = List.generate(_dim[1], (_) => 0, growable: false);
   }
 
   void size(List<int> dim) {
@@ -28,13 +33,14 @@ class ScanlineBuffer {
   }
 
   void placeMessage(String msg, {int xPos = 1, int yPos = 1, bool cll = false}) {
-    final StringBuffer sb = _lines[yPos-1];
-    if (cll) { ansi.cll(sb); }
+    _buffer.clear();
+    if (cll) { ansi.cll(_buffer); }
     if (msg.isNotEmpty) {
-      ansi.cha(sb, xPos);
-      sb.write(msg);
-      ansi.reset(sb);
+      ansi.cha(_buffer, xPos);
+      _buffer.write(msg);
+      ansi.reset(_buffer);
     }
+    if (_buffer.length > 0) { _lines[yPos-1].write(_buffer.toString()); }
   }
 
   void placeMessageRelative(String msg,
@@ -57,11 +63,18 @@ class ScanlineBuffer {
     final int m = _lines.length;
 
     _buffer.clear();
+    int oldHash, newHash;
     while (i < m) {
-      ansi.xy(_buffer, 1, 1+i);
-      _buffer.write(_lines[i].toString());
+      oldHash = _hashes[i];
+      newHash = _lines[i].toString().hashCode;
+      if (_lines[i].length > 0 && newHash != oldHash) {
+        _hashes[i] = newHash;
+        ansi.xy(_buffer, 1, 1+i);
+        _buffer.write(_lines[i].toString());
+      }
       i += scanGap;
     }
+    //Log.debug(_logLabel, 'printNextScanline() printing ${_buffer.length} chars for scanline ${_currentScanline}');
     _printer.printBuffer(_buffer);
 
     _currentScanline++;

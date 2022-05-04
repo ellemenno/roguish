@@ -5,8 +5,8 @@ import 'src/creature.dart';
 import 'src/room.dart';
 
 class GameData {
-  final int fps = 36;
-  final int scanGap = 18;
+  final int fps = 60;
+  final int scanGap = 2;
   final List<Creature> players = [];
   final List<Room> rooms = [];
   final List<List<Cell>> levelMap = [];

@@ -43,6 +43,7 @@ class TerminalPrinter {
 
   /// Print provided string buffer [sb] to the output stream. Optionally clear the buffer after.
   void printBuffer(StringBuffer sb, {clearOnWrite = true}) {
+    if (sb.length == 0) { return; }
     _fd.write(sb.toString());
     if (clearOnWrite) { sb.clear(); }
   }
