@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:rougish/game/game_data.dart';
 import 'package:rougish/term/ansi.dart' as ansi;
+import 'package:rougish/term/scanline_buffer.dart';
+import 'package:rougish/term/terminal_printer.dart';
 
 import 'src/command_screen.dart';
 import 'src/debug_screen.dart';
@@ -26,14 +29,14 @@ enum ScreenEvent {
 }
 
 abstract class Screen {
-  static final StringBuffer _sb = StringBuffer();
+  static late ScanlineBuffer _sb; // all screens share/reuse the same temp string buffer
+  static ScanlineBuffer get screenBuffer => _sb;
+  static set screenBuffer(ScanlineBuffer sb) => _sb = sb;
 
   static void blankScreen() {
-    ansi.xy(_sb, 1, 1);
-    ansi.clh(_sb, hideCursor: true);
+    _sb.blankScreen();
   }
 
-  StringBuffer get screenBuffer => _sb; // all screens share/reuse the same temp string buffer
 
   final StreamController<ScreenEvent> _eventBroadcaster = StreamController<ScreenEvent>.broadcast();
 

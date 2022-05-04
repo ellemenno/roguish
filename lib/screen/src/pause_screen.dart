@@ -2,6 +2,7 @@ import 'package:rougish/config/config.dart' as config;
 import 'package:rougish/game/game_data.dart';
 import 'package:rougish/log/log.dart';
 import 'package:rougish/term/ansi.dart' as ansi;
+import 'package:rougish/term/scanline_buffer.dart';
 import 'package:rougish/term/terminal.dart' as term;
 import '../screen.dart';
 
@@ -30,18 +31,18 @@ class PauseScreen extends Screen {
     return (item == _curOption) ? '${ansi.flip}${label}${ansi.flop}' : label;
   }
 
-  void _dialog(StringBuffer sb) {
+  void _dialog(ScanlineBuffer sb) {
     String lh;
-    term.centerMessage(sb, ' .${_dlg[0]}. ', yOffset: -3);
-    term.centerMessage(sb, ' |${_dlg[1]}| ', yOffset: -2);
-    term.centerMessage(sb, ' |${_dlg[2]}| ', yOffset: -1);
+    sb.centerMessage(' .${_dlg[0]}. ', yOffset: -3);
+    sb.centerMessage(' |${_dlg[1]}| ', yOffset: -2);
+    sb.centerMessage(' |${_dlg[2]}| ', yOffset: -1);
     lh = _hilightSelected(_dlg[3], 0);
-    term.centerMessage(sb, ' |${lh}| ', yOffset: 0, msgOffset: (_dlg[3].length - lh.length));
+    sb.centerMessage(' |${lh}| ', yOffset: 0, msgOffset: (_dlg[3].length - lh.length));
     lh = _hilightSelected(_dlg[4], 1);
-    term.centerMessage(sb, ' |${lh}| ', yOffset: 1, msgOffset: (_dlg[4].length - lh.length));
-    term.centerMessage(sb, ' |${_dlg[5]}| ', yOffset: 2);
-    term.centerMessage(sb, ' |${_dlg[6]}| ', yOffset: 3);
-    term.centerMessage(sb, ' \'${_dlg[7]}\' ', yOffset: 4);
+    sb.centerMessage(' |${lh}| ', yOffset: 1, msgOffset: (_dlg[4].length - lh.length));
+    sb.centerMessage(' |${_dlg[5]}| ', yOffset: 2);
+    sb.centerMessage(' |${_dlg[6]}| ', yOffset: 3);
+    sb.centerMessage(' \'${_dlg[7]}\' ', yOffset: 4);
   }
 
   @override
@@ -67,6 +68,6 @@ class PauseScreen extends Screen {
 
   @override
   void draw(GameData state) {
-    _dialog(screenBuffer);
+    _dialog(Screen.screenBuffer);
   }
 }

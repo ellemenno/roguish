@@ -1,5 +1,6 @@
 import 'package:rougish/game/game_data.dart';
 import 'package:rougish/game/map.dart' as map;
+import 'package:rougish/term/scanline_buffer.dart';
 import 'package:rougish/term/terminal.dart' as term;
 import '../screen.dart';
 
@@ -7,60 +8,68 @@ class TestScreen extends Screen {
   final StringBuffer _charSeq = StringBuffer();
   final _dim = List<int>.filled(2, 0);
 
-  void _announceSize(StringBuffer sb) {
-    term.size(_dim);
-    term.centerMessage(sb, 'terminal is ${_dim[0]} columns x ${_dim[1]} lines', yOffset: 0);
+  void _announceSize(ScanlineBuffer sb) {
+    sb.size(_dim);
+    sb.centerMessage('terminal is ${_dim[0]} columns x ${_dim[1]} lines', yOffset: 0);
   }
 
-  void _printInput(StringBuffer sb) {
-    term.centerMessage(sb, '${_charSeq}', yOffset: 3);
+  void _printInput(ScanlineBuffer sb) {
+    sb.centerMessage('${_charSeq}', yOffset: 3);
     _charSeq.clear();
   }
 
-  void _paintSymbols(StringBuffer sb) {
-    term.placeMessage(sb, 'font check for symbol coverage', xPos: 0, yPos: 2);
-    term.placeMessage(sb, '      ui: ', xPos: 0, yPos: 4);
+  void _paintSymbols(ScanlineBuffer sb) {
+    String s = '';
+    int y = 2;
+    sb.placeMessage('font check for symbol coverage', xPos: 1, yPos: y);
+
+    y++; s = '';
+    sb.placeMessage('      ui: ', yPos: y++);
     for (var t in map.UIType.values) {
-      sb.write(map.uiSymbol(t));
+      s += map.uiSymbol(t);
     }
-    sb.write('\n');
-    sb.write('          ');
+    sb.placeMessage(s, yPos: y++);
+    s = '          ';
     for (var i = 0; i < map.UIType.values.length; i++) {
-      sb.write('-');
+      s += '-';
     }
+    sb.placeMessage(s, yPos: y++);
 
-    sb.write('\n');
-    sb.write('    cell: ');
+    y++; s = '';
+    sb.placeMessage('    cell: ', yPos: y++);
     for (var t in map.CellType.values) {
-      sb.write(map.cellSymbol(t));
+      s += map.cellSymbol(t);
     }
-    sb.write('\n');
-    sb.write('          ');
+    sb.placeMessage(s, yPos: y++);
+    s = '          ';
     for (var i = 0; i < map.CellType.values.length; i++) {
-      sb.write('-');
+      s += '-';
     }
+    sb.placeMessage(s, yPos: y++);
 
-    sb.write('\n');
-    sb.write('creature: ');
+    y++; s = '';
+    sb.placeMessage('creature: ', yPos: y++);
     for (var t in map.CreatureType.values) {
-      sb.write(map.creatureSymbol(t));
+      s += map.creatureSymbol(t);
     }
-    sb.write('\n');
-    sb.write('          ');
+    sb.placeMessage(s, yPos: y++);
+    s = '          ';
     for (var i = 0; i < map.CreatureType.values.length; i++) {
-      sb.write('-');
+      s += '-';
     }
+    sb.placeMessage(s, yPos: y++);
 
-    sb.write('\n');
-    sb.write('    item: ');
+    y++; s = '';
+    sb.placeMessage('    item: ', yPos: y++);
     for (var t in map.ItemType.values) {
-      sb.write(map.itemSymbol(t));
+      s += map.itemSymbol(t);
     }
-    sb.write('\n');
-    sb.write('          ');
+    sb.placeMessage(s, yPos: y++);
+    s = '          ';
     for (var i = 0; i < map.ItemType.values.length; i++) {
-      sb.write('-');
+      s += '-';
     }
+    sb.placeMessage(s, yPos: y++);
   }
 
   @override
@@ -70,14 +79,13 @@ class TestScreen extends Screen {
 
   @override
   void draw(GameData state) {
-    _announceSize(screenBuffer);
-    _printInput(screenBuffer);
-    _paintSymbols(screenBuffer);
+    _announceSize(Screen.screenBuffer);
+    _printInput(Screen.screenBuffer);
+    _paintSymbols(Screen.screenBuffer);
 
     int pauseCode = int.parse(state.conf['key-pause']!);
     int commandCode = int.parse(state.conf['key-command']!);
-    term.centerMessage(
-        screenBuffer,
+    Screen.screenBuffer.centerMessage(
         [
           'listening for keys.',
           '${term.asciiToString(pauseCode)} for menu.',

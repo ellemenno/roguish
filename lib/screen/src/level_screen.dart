@@ -3,6 +3,7 @@ import 'package:rougish/game/game_data.dart';
 import 'package:rougish/game/map.dart' as map;
 import 'package:rougish/log/log.dart';
 import 'package:rougish/term/ansi.dart' as ansi;
+import 'package:rougish/term/scanline_buffer.dart';
 import 'package:rougish/term/terminal.dart' as term;
 import '../screen.dart';
 
@@ -10,16 +11,11 @@ class LevelScreen extends Screen {
   static const _logLabel = 'LevelScreen';
   final _dim = List<int>.filled(2, 0);
 
-  void _mapSize() {
-    term.size(_dim, useCache: false);
-    // leave a row at the top and bottom for the ui
-    _dim[1] -= 2;
-  }
-
-  void _newLevel(GameData state) {
+  void _newLevel(ScanlineBuffer screenBuffer, GameData state) {
     state.newLevel = false;
-    _mapSize();
-    int cols = _dim[0], rows = _dim[1];
+    screenBuffer.size(_dim);
+    // leave a row at the top and bottom for the ui
+    int cols = _dim[0], rows = _dim[1] - 2;
     Log.debug(_logLabel, 'draw() new level - level: ${state.level}, rows: ${rows}, cols: ${cols}');
     // if new dimensions:  dispose, allocate, generate
     // if empty:           ..       allocate, generate
@@ -35,14 +31,12 @@ class LevelScreen extends Screen {
         state.levelMap, state.rooms, state.players, state.prng, state.level, state.levelMax);
   }
 
-  void _drawMap(StringBuffer screenBuffer, GameData state) {
-    ansi.xy(screenBuffer, 1, 1);
-    ansi.cll(screenBuffer);
-    ansi.xy(screenBuffer, 1, 2);
-    map.LevelManager.render(screenBuffer, state.levelMap);
+  void _drawMap(ScanlineBuffer screenBuffer, GameData state) {
+    screenBuffer.placeMessage('', yPos:1, cll:true);
+    map.LevelManager.render(screenBuffer, state.levelMap, yOffset:1);
   }
 
-  void _drawUI(StringBuffer screenBuffer, GameData state) {
+  void _drawUI(ScanlineBuffer screenBuffer, GameData state) {
     //    ≡ 1  xp 00  ♥ 00    + 00  ᚹ 00  ⚘ 00  $ 0
     String msg = ''
         '  '
@@ -54,7 +48,7 @@ class LevelScreen extends Screen {
         '  ${map.uiSymbol(map.UIType.runes)} ${state.runes.toString().padLeft(2, '0')}'
         '  ${map.uiSymbol(map.UIType.herbs)} ${state.herbs.toString().padLeft(2, '0')}'
         '  ${map.uiSymbol(map.UIType.coins)} ${state.coins}';
-    term.placeMessageRelative(screenBuffer, msg, yPercent: 100);
+    screenBuffer.placeMessageRelative(msg, yPercent: 100);
   }
 
   @override
@@ -77,9 +71,9 @@ class LevelScreen extends Screen {
   @override
   void draw(GameData state) {
     if (state.newLevel) {
-      _newLevel(state);
+      _newLevel(Screen.screenBuffer, state);
     }
-    _drawMap(screenBuffer, state);
-    _drawUI(screenBuffer, state);
+    _drawMap(Screen.screenBuffer, state);
+    _drawUI(Screen.screenBuffer, state);
   }
 }

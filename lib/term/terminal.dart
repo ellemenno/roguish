@@ -1,14 +1,8 @@
-/// utilities for reading from and printing to the terminal.
+/// utilities for reading from the terminal and understanding terminal character sequences.
 library terminal;
 
 import 'dart:async';
 import 'dart:io';
-
-import 'package:rougish/term/ansi.dart' as ansi;
-
-final _dim = List<int>.filled(2, 0);
-int _terminalColumns = -1;
-int _terminalLines = -1;
 
 /// start of heading
 const sh = 0x01;
@@ -69,12 +63,6 @@ enum SeqKey {
   f11,
   f12,
 }
-
-// make these re-assignable to support test mocks and other options
-//  curently, analyzer incorrectly flags:
-//  https://github.com/dart-lang/linter/pull/3118
-var print = (String msg) => stderr.write(msg);
-var printBuffer = (StringBuffer sb) => stderr.write(sb.toString());
 
 /// Determine whether a given sequence of codes represents a printable ASCII character.
 /// This implementation only passes single code sequences from `0x20` to `0x7e`
@@ -288,18 +276,6 @@ SeqKey seqKeyFromCodes(List<int> codes) {
   return SeqKey.none;
 }
 
-/// Retrieve terminal width (columns), and height (rows) in a two-element list.
-///
-/// Unless [useCache] is set to `false`, dimensions will be provided from cached values.
-void size(List<int> dim, {bool useCache = true}) {
-  if (useCache == false || _terminalColumns < 0 || _terminalLines < 0) {
-    _terminalColumns = stderr.terminalColumns;
-    _terminalLines = stderr.terminalLines;
-  }
-  dim[0] = _terminalColumns;
-  dim[1] = _terminalLines;
-}
-
 /// Subscribe a listener function for key sequences emitted from the terminal.
 StreamSubscription<List<int>> listen(
     void Function(List<int>) dataHandler, void Function(Object error) errorHandler) {
@@ -307,83 +283,4 @@ StreamSubscription<List<int>> listen(
     ..echoMode = false // for windows sake, echoMode must be disabled first
     ..lineMode = false; // see https://github.com/dart-lang/sdk/issues/28599#issuecomment-615940833
   return stdin.listen(dataHandler, onError: errorHandler);
-}
-
-/// Emit the ANSI code to hide the cursor.
-void hideCursor() {
-  print(ansi.hide);
-}
-
-/// Emit the ANSI code to show the cursor.
-void showCursor() {
-  print(ansi.show);
-}
-
-/// Clear the screen and move the cursor to 0,0 (top left corner).
-///
-/// The provided stringbuffer is cleared and filled with ANSI codes to reset styles,
-/// clear the screen, and position the cursor in the top left corner.
-/// Optionally, scrollback history can be cleared, and the cursor can be hidden.
-/// The provided stringbuffer is empty when this command completes.
-void clear(StringBuffer sb, {hideCursor = false, clearHistory = false}) {
-  sb.clear();
-  ansi.reset(sb);
-  ansi.xy(sb, 1, 1);
-  if (clearHistory) {
-    ansi.clh(sb);
-  } else {
-    ansi.cls(sb, n: 2);
-  }
-  if (hideCursor) {
-    sb.write(ansi.hide);
-  }
-  printBuffer(sb);
-  sb.clear();
-}
-
-/// Add ANSI codes to the provided string buffer to print a message at specific coordinates of the screen.
-/// The provided stringbuffer is concatened to (not cleared). The buffer is not sent to stderr in this method (see [printBuffer]).
-///
-/// [xPos] sets the horizontal position of the message.
-/// [yPos] sets the vertical position of the message.
-/// [cll] if `true`, clears the row before printing.
-void placeMessage(StringBuffer sb, String msg, {int xPos = 1, int yPos = 1, bool cll = false}) {
-  //sb.clear();
-  ansi.xy(sb, xPos, yPos);
-  if (cll) {
-    ansi.cll(sb);
-  }
-  sb.write(msg);
-  ansi.reset(sb);
-}
-
-/// Add ANSI codes to the provided string buffer to print the provided message at relative coordinates of the screen.
-///
-/// The provided stringbuffer is concatened to (not cleared).
-/// [xPercent] sets the horizontal position of the message. `0` maps to the first column (left-most), `100` to the last (right-most).
-/// [yPercent] sets the vertical position of the message. `0` maps to the first row (top), `100` maps to the last row (bottom).
-/// [xOffset] adjusts the horizontal position of the message (in absolute columns, not percent).
-/// [yOffset] adjusts the vertical position of the message (in absolute rows, not percent).
-/// [cll] if `true`, clears the row before printing.
-void placeMessageRelative(StringBuffer sb, String msg,
-    {int xPercent = 0, int yPercent = 0, int xOffset = 0, int yOffset = 0, bool cll = false}) {
-  size(_dim);
-  int x = (_dim[0] * xPercent / 100).floor() + xOffset;
-  int y = (_dim[1] * yPercent / 100).floor() + yOffset;
-  placeMessage(sb, msg, xPos: x, yPos: y, cll: cll);
-}
-
-/// Add ANSI codes to the provided string buffer to print the provided message in the middle of the screen.
-///
-/// The provided stringbuffer is concatened to (not cleared).
-/// [xOffset] adjusts the horizontal position of the message.
-/// [yOffset] adjusts the vertical position of the message.
-/// [msgOffset] adjusts the calculated length of the message before centering.
-/// [cll] if `true`, clears the row before printing.
-void centerMessage(StringBuffer sb, String msg,
-    {int xOffset = 0, int yOffset = 0, int msgOffset = 0, bool cll = false}) {
-  size(_dim);
-  int x = (_dim[0] / 2).floor() - ((msg.length + msgOffset) / 2).floor() + xOffset;
-  int y = (_dim[1] / 2).floor() + yOffset;
-  placeMessage(sb, msg, xPos: x, yPos: y, cll: cll);
 }

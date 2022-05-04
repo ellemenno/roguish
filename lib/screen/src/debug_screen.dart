@@ -5,7 +5,7 @@ import '../screen.dart';
 
 class DebugScreen extends Screen {
   final double microsecondsPerSecond = 1e+6;
-  final _frameSamples = List<int>.filled(100, 0);
+  final _frameSamples = List<int>.filled(90, 0);
   int _sampleIndex = 0;
 
   String _pad(Object n, int w, {String c = ' '}) => n.toString().padLeft(w, c);
@@ -18,7 +18,7 @@ class DebugScreen extends Screen {
   }
 
   num _microsecondsPerFrame(int sample) {
-    // average µspf
+    // SMA - simple moving average of µspf
     _frameSamples[_sampleIndex] = sample;
     _sampleIndex = (_sampleIndex + 1) % _frameSamples.length;
     int sum = 0, numSamples = 0;
@@ -39,22 +39,24 @@ class DebugScreen extends Screen {
     num frameBudget = microsecondsPerSecond / state.fps;
     num frameCost = _microsecondsPerFrame(state.frameMicroseconds);
     num frameBalance = frameBudget - frameCost;
-    String keyCode = term.codeHash(state.keyCodes);
     bool neg = frameBalance < 0;
+    String keyCode = term.codeHash(state.keyCodes);
     String msg = [
       '   ',
-      '${neg ? ansi.flip : ''}${(frameBalance / 1000).round()}${neg ? ansi.flop : ''} mspf',
+      '${frameCost.round()}/${frameBudget.round()} µspf',
+      //'${neg ? ansi.flip : ''}${(frameBalance / 1000).round()}${neg ? ansi.flop : ''} mspf',
       '${_pad(keyCode, 10)} key',
       '${_pad(state.seed, 10)} seed',
     ].join(' ');
-    int ansiLength = neg ? ansi.flip.length + ansi.flop.length : 0;
-    term.placeMessageRelative(screenBuffer, msg,
+    int ansiLength = 0;
+    //int ansiLength = neg ? ansi.flip.length + ansi.flop.length : 0;
+    Screen.screenBuffer.placeMessageRelative(msg,
         xPercent: 100, xOffset: -1 * (msg.length - ansiLength), cll: false);
   }
 
   @override
   void blank() {
     _zero(_frameSamples);
-    term.placeMessage(screenBuffer, ' ', xPos: 1, yPos: 1, cll: true);
+    Screen.screenBuffer.placeMessage(' ', xPos: 1, yPos: 1, cll: true);
   }
 }

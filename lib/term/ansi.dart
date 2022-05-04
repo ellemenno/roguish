@@ -1,4 +1,8 @@
 /// helper functions for ansi codes.
+///
+/// references:
+/// - https://en.wikipedia.org/wiki/ANSI_escape_code
+/// - https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
 library ansi;
 
 /// Reset to Initial State: clears screen and history and shows cursor
@@ -24,6 +28,12 @@ const hide = '${csi}?25l';
 
 /// Shows cursor
 const show = '${csi}?25h';
+
+/// Enters new screen buffer
+const enterBuffer = '${csi}?1049h';
+
+/// Leaves screen buffer, returning to previous
+const leaveBuffer = '${csi}?1049l';
 
 /// Represents no color (not an ANSI code)
 const none = -1;
@@ -93,9 +103,27 @@ void reset(StringBuffer sb) {
 ///
 /// [x] and [y] are 1-based, up to `dart:io.Stdout.terminalColumns` and `dart:io.Stdout.terminalLines`.
 void xy(StringBuffer sb, int x, int y) {
-  // position cursor (VT goes line first, then column)
+  // cursor position (VT goes line first, then column)
   // \e[y;xH
   sb.write('${csi}${y};${x}H');
+}
+
+/// Prints an ansi code into [sb] to position the terminal cursor at column [x] of the current line.
+///
+/// [x] is 1-based, up to `dart:io.Stdout.terminalLines`.
+void cha(StringBuffer sb, [int x = 1]) {
+  // cursor horizontal absolute
+  // \e[xG
+  sb.write('${csi}${x}G');
+}
+
+/// Prints an ansi code into [sb] to position the terminal cursor at beginning of the line [y] lines down (default `1`).
+///
+/// [y] is 1-based, up to `dart:io.Stdout.terminalLines`.
+void cnl(StringBuffer sb, [int y = 1]) {
+  // cursor next line
+  // \e[yE
+  sb.write('${csi}${y}E');
 }
 
 /// Prints an ansi code into [sb] to clear some or all of the terminal screen.

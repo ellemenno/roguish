@@ -126,11 +126,11 @@ class CommandScreen extends Screen {
   @override
   void draw(GameData state) {
     _input.toStringBuffer(_cmd);
-    term.placeMessage(screenBuffer, '> ${_cmd}', xPos: 1, yPos: 1, cll: true);
+    Screen.screenBuffer.placeMessage('> ${_cmd}', xPos: 1, yPos: 1, cll: true);
   }
 
   @override
   void blank() {
-    term.placeMessage(screenBuffer, ' ', xPos: 1, yPos: 1, cll: true);
+    Screen.screenBuffer.placeMessage(' ', xPos: 1, yPos: 1, cll: true);
   }
 }

@@ -5,7 +5,10 @@ import 'dart:io';
 import 'package:rougish/config/config.dart' as config;
 import 'package:rougish/game/game_data.dart';
 import 'package:rougish/log/log.dart';
+import 'package:rougish/term/ansi.dart' as ansi;
 import 'package:rougish/term/terminal.dart' as term;
+import 'package:rougish/term/scanline_buffer.dart';
+import 'package:rougish/term/terminal_printer.dart';
 import 'package:rougish/screen/screen.dart';
 
 const logLabel = 'rougish';
@@ -19,7 +22,8 @@ final Screen title = Screen.title();
 final Screen setup = Screen.setup();
 final Screen level = Screen.level();
 final Screen debrief = Screen.debrief();
-final StringBuffer screenBuffer = title.screenBuffer;
+final TerminalPrinter termPrinter = TerminalPrinter(stdout);
+final ScanlineBuffer scanlineBuffer = ScanlineBuffer(termPrinter);
 late final Timer frameTimer;
 late final StreamSubscription<List<int>> termListener;
 late final GameData state;
@@ -28,11 +32,11 @@ late Screen currentScreen;
 late StreamSubscription<ScreenEvent> screenListener;
 int _logCountdown = 0;
 int _logFrames = 30;
-int _drawCountdown = 0;
-int _drawFrames = 6;
+int _scanLine = 0;
 bool paused = false;
 bool commandBarOpen = false;
 bool debugPanelOpen = false;
+bool _drawReady = true;
 
 void pushScreen(Screen screen) {
   if (screenStack.isNotEmpty) {
@@ -71,7 +75,7 @@ void popAllScreens() {
   Screen.blankScreen();
 }
 
-void redrawScreens(TimelineTask trace) {
+void redrawScreens(TimelineTask trace) async {
   TimelineTask screenTask;
   // update screen buffer
   for (final screen in screenStack) {
@@ -87,14 +91,15 @@ void redrawScreens(TimelineTask trace) {
     debugPanel.draw(state);
     screenTask.finish();
   }
+}
 
+bool printScanline(TimelineTask trace) {
+  TimelineTask printTask = TimelineTask(parent: trace);
   // draw buffer to screen
-  screenTask = TimelineTask(parent: trace);
-  screenTask.start('printBuffer');
-  term.printBuffer(screenBuffer);
-  screenTask.finish();
-  // clear buffer for next frame
-  screenBuffer.clear();
+  printTask.start('printBuffer');
+  bool scanningComplete = scanlineBuffer.printNextScanline();
+  printTask.finish();
+  return scanningComplete;
 }
 
 void onResize() {
@@ -181,14 +186,15 @@ void onLevelRegen() {
   state.newLevel = true;
 }
 
-void onQuit() {
+void onQuit() async {
   Log.info(logLabel, 'onQuit() quitting..');
   frameTimer.cancel();
   screenListener.cancel();
   termListener.cancel();
-  term.clear(screenBuffer, hideCursor: true, clearHistory: true);
-  term.print('thank you for playing.\n');
-  term.showCursor();
+  scanlineBuffer.blankScreen();
+  scanlineBuffer.clear();
+  termPrinter.print('thank you for playing.\n');
+  termPrinter.print(ansi.show);
   exit(0);
 }
 
@@ -262,22 +268,21 @@ void onFrame(Timer t) {
   frameTask = TimelineTask();
   frameTask.start('rougish::onFrame');
 
-  state.frameMicroseconds = stopwatch.elapsedMicroseconds;
-  stopwatch.reset();
-
-  if (_drawCountdown == 0) {
+  if (_drawReady) {
     redrawScreens(frameTask);
-    _drawCountdown = _drawFrames;
   }
-  _drawCountdown--;
+  _drawReady = printScanline(frameTask);
 
-  if (_logCountdown == 0) {
+  _logCountdown--;
+  if (_logCountdown < 1) {
     (Log.printer as BufferedFilePrinter).flush();
     _logCountdown = _logFrames;
   }
-  _logCountdown--;
 
   frameTask.finish();
+
+  state.frameMicroseconds = stopwatch.elapsedMicroseconds;
+  stopwatch.reset();
 }
 
 void addSignalListeners() {
@@ -298,7 +303,7 @@ void addSignalListeners() {
 }
 
 void main(List<String> arguments) {
-  term.clear(screenBuffer, hideCursor: true, clearHistory: true);
+  scanlineBuffer.blankScreen();
 
   Map<String, String> conf = config.fromFile('bin/rougish.conf');
   int prngSeed = config.prngSeed(conf);
@@ -319,9 +324,10 @@ void main(List<String> arguments) {
     Log.warn(logLabel, 'listener zone exception: ${e}');
   });
 
+  scanlineBuffer.scanGap = state.scanGap;
+  Screen.screenBuffer = scanlineBuffer;
   pushScreen(title);
 
-  _drawFrames = state.fps ~/ 5;
   _logFrames = state.fps ~/ 2;
   frameTimer = Timer.periodic(Duration(milliseconds: 1000 ~/ state.fps), onFrame);
   stopwatch.start();

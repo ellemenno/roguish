@@ -1,3 +1,6 @@
+import 'package:rougish/term/ansi.dart' as ansi;
+import 'package:rougish/term/scanline_buffer.dart';
+
 import './cell.dart';
 import './creature.dart';
 import './map_types.dart';
@@ -45,11 +48,11 @@ class LevelManager {
   }
 
   static void towards(List<List<Cell>> map, Creature c, int dc, int dr) {
-    int oldCol = c.col;
-    int oldRow = c.row;
-    int newCol = oldCol + dc;
-    int newRow = oldRow + dr;
-    Cell targetCell = map[newRow][newCol];
+    final int oldCol = c.col;
+    final int oldRow = c.row;
+    final int newCol = oldCol + dc;
+    final int newRow = oldRow + dr;
+    final Cell targetCell = map[newRow][newCol];
 
     if (_isTraversable(targetCell)) {
       if (_isUnoccupied(targetCell)) {
@@ -61,8 +64,8 @@ class LevelManager {
   }
 
   static void move(List<List<Cell>> map, Creature c, int newCol, int newRow) {
-    int oldCol = c.col;
-    int oldRow = c.row;
+    final int oldCol = c.col;
+    final int oldRow = c.row;
     map[oldRow][oldCol].occupant = Creature.noCreature;
     map[newRow][newCol].occupant = c;
     // TODO: acquire items
@@ -70,17 +73,14 @@ class LevelManager {
     c.row = newRow;
   }
 
-  static void render(StringBuffer screenBuffer, List<List<Cell>> map) {
-    int rows = map.length;
-    int cols = map.first.length;
+  static void render(ScanlineBuffer screenBuffer, List<List<Cell>> map, {int yOffset = 0}) {
+    final int rows = map.length;
+    final int cols = map.first.length;
     Cell cell;
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < cols; c++) {
         cell = map[r][c];
-        screenBuffer.write(cell.toString());
-      }
-      if (r + 1 < rows) {
-        screenBuffer.write('\n');
+        screenBuffer.placeMessage(cell.toString(), xPos: 1+c, yPos: 1+yOffset+r);
       }
     }
   }

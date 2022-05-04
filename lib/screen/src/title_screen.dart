@@ -16,7 +16,7 @@ class TitleScreen extends Screen {
 
   @override
   void draw(GameData state) {
-    term.centerMessage(screenBuffer, 'Rougish', yOffset: -3);
-    term.centerMessage(screenBuffer, '<press Enter key to continue>', yOffset: 3);
+    Screen.screenBuffer.centerMessage('Rougish', yOffset: -3);
+    Screen.screenBuffer.centerMessage('<press Enter key to continue>', yOffset: 3);
   }
 }

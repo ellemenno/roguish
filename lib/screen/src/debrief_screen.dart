@@ -16,8 +16,8 @@ class DebriefScreen extends Screen {
 
   @override
   void draw(GameData state) {
-    term.centerMessage(screenBuffer, 'debrief screen', yOffset: -3);
-    term.centerMessage(screenBuffer, 'stats and stuff..', yOffset: 1);
-    term.centerMessage(screenBuffer, '<press Enter key to exit>', yOffset: 3);
+    Screen.screenBuffer.centerMessage('debrief screen', yOffset: -3);
+    Screen.screenBuffer.centerMessage('stats and stuff..', yOffset: 1);
+    Screen.screenBuffer.centerMessage('<press Enter key to exit>', yOffset: 3);
   }
 }
