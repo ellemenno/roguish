@@ -90,6 +90,7 @@ class ScanlineBuffer {
   void blankScreen() {
     clear();
     _buffer.clear();
+    _hashes.fillRange(0, _hashes.length, 0);
     ansi.xy(_buffer, 1, 1);
     ansi.clh(_buffer, hideCursor: true);
     _printer.printBuffer(_buffer);
