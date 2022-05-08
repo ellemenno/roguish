@@ -34,6 +34,7 @@ abstract class Screen {
   static set screenBuffer(ScanlineBuffer sb) => _sb = sb;
 
   static void blankScreen() {
+    _sb.dirtyLines(lineA: 0, lineB: -1);
     _sb.blankScreen();
   }
 

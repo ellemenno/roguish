@@ -67,6 +67,12 @@ class PauseScreen extends Screen {
   }
 
   @override
+  void blank() {
+    int centerline = Screen.screenBuffer.centerline;
+    Screen.screenBuffer.dirtyLines(lineA: centerline - 3, lineB: centerline + 4);
+  }
+
+  @override
   void draw(GameData state) {
     _dialog(Screen.screenBuffer);
   }
