@@ -34,6 +34,7 @@ class GameData {
 
   List<int> keyCodes = [];
   int frameMicroseconds = 0;
+  int frameCharacters = 0;
 
   void reseed(int seed) {
     _seed = seed;

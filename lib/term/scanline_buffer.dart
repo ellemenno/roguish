@@ -1,7 +1,6 @@
-
 import 'dart:math' as math;
+import 'package:rougish/game/game_data.dart';
 import 'package:rougish/log/log.dart';
-
 import './ansi.dart' as ansi;
 import './terminal_printer.dart';
 
@@ -61,7 +60,7 @@ class ScanlineBuffer {
     placeMessage(msg, xPos: x, yPos: y, cll: cll);
   }
 
-  bool printNextScanline() {
+  bool printNextScanline(GameData state) {
     bool scanningComplete = false;
     int i = _currentScanline;
     final int m = _lines.length;
@@ -80,6 +79,7 @@ class ScanlineBuffer {
       i += scanGap;
     }
     //Log.debug(_logLabel, 'printNextScanline() printing ${_buffer.length} chars for scanline ${_currentScanline}');
+    state.frameCharacters = _buffer.length;
     _printer.printBuffer(_buffer);
 
     _currentScanline++;

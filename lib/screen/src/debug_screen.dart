@@ -3,60 +3,90 @@ import 'package:rougish/term/ansi.dart' as ansi;
 import 'package:rougish/term/terminal.dart' as term;
 import '../screen.dart';
 
-class DebugScreen extends Screen {
-  final double microsecondsPerSecond = 1e+6;
-  final _frameSamples = List<int>.filled(90, 0);
-  int _sampleIndex = 0;
+class Sampler {
+  late final List<int> _history;
+  int _index = 0;
+  num _sma = 0.0;
 
-  String _pad(Object n, int w, {String c = ' '}) => n.toString().padLeft(w, c);
-
-  void _zero(List<int> list) {
+  static void _zero(List<int> list) {
     final int n = list.length;
     for (int i = 0; i < n; i++) {
       list[i] = 0;
     }
   }
 
-  num _microsecondsPerFrame(int sample) {
-    // SMA - simple moving average of µspf
-    _frameSamples[_sampleIndex] = sample;
-    _sampleIndex = (_sampleIndex + 1) % _frameSamples.length;
+  Sampler(numSamples) {
+    _history = List<int>.filled(numSamples, 0);
+  }
+
+  addSample(int sample) {
+    _history[_index] = sample;
+    _index = (_index + 1) % _history.length;
     int sum = 0, numSamples = 0;
-    for (int ms in _frameSamples) {
-      if (ms > 0) {
-        sum += ms;
+    for (int s in _history) {
+      if (s > 0) {
+        sum += s;
         numSamples++;
       }
     }
-    return sum / numSamples;
+    _sma = numSamples > 0 ? sum / numSamples : 0.0;
   }
+
+  void zero() => _zero(_history);
+
+  num get simpleMovingAverage => _sma;
+}
+
+class DebugScreen extends Screen {
+  static const double _microsecondsPerSecond = 1e+6;
+  static const int _numSamples = 90;
+  final StringBuffer _msgBuffer = StringBuffer();
+  final Sampler _frameSampler = Sampler(_numSamples);
+  final Sampler _charsSampler = Sampler(_numSamples);
+
+  String _pad(Object n, int w, {String c = ' '}) => n.toString().padLeft(w, c);
 
   @override
   void onKeySequence(List<int> seq, String hash, GameData state) {}
 
   @override
   void draw(GameData state) {
-    num frameBudget = microsecondsPerSecond / state.fps;
-    num frameCost = _microsecondsPerFrame(state.frameMicroseconds);
-    num frameBalance = frameBudget - frameCost;
-    bool neg = frameBalance < 0;
+    _frameSampler.addSample(state.frameMicroseconds);
+    _charsSampler.addSample(state.frameCharacters);
+
+    num frameBudget = _microsecondsPerSecond / state.fps;
+    num frameCost = _frameSampler.simpleMovingAverage;
+    num frameChars = _charsSampler.simpleMovingAverage;
     String keyCode = term.codeHash(state.keyCodes);
-    String msg = [
-      '   ',
-      '${frameCost.round()}/${frameBudget.round()} µspf',
-      //'${neg ? ansi.flip : ''}${(frameBalance / 1000).round()}${neg ? ansi.flop : ''} mspf',
-      '${_pad(keyCode, 10)} key',
-      '${_pad(state.seed, 10)} seed',
-    ].join(' ');
+
     int ansiLength = 0;
-    //int ansiLength = neg ? ansi.flip.length + ansi.flop.length : 0;
-    Screen.screenBuffer.placeMessageRelative(msg,
-        xPercent: 100, xOffset: -1 * (msg.length - ansiLength), cll: false);
+    int formatLabel(lbl) => ansi.c16(_msgBuffer, lbl, fg: ansi.c16_black, fb: true);
+
+    _msgBuffer.clear();
+    _msgBuffer.write('   ');
+    if (frameCost > frameBudget) {
+      ansiLength += ansi.reverse(_msgBuffer, '${frameCost.round()}');
+    }
+    else {
+      _msgBuffer.write('${frameCost.round()}');
+    }
+    _msgBuffer.write('/${frameBudget.round()} ');
+    ansiLength += formatLabel('µspf');
+    _msgBuffer.write('${_pad(frameChars.round(), 5)} ');
+    ansiLength += formatLabel('cpf');
+    _msgBuffer.write('${_pad(keyCode, 10)} ');
+    ansiLength += formatLabel('key');
+    _msgBuffer.write('${_pad(state.seed, 10)} ');
+    ansiLength += formatLabel('seed');
+
+    Screen.screenBuffer.placeMessageRelative(_msgBuffer.toString(),
+        xPercent: 100, xOffset: -1 * (_msgBuffer.length - ansiLength), cll: false);
   }
 
   @override
   void blank() {
-    _zero(_frameSamples);
+    _frameSampler.zero();
+    _charsSampler.zero();
     Screen.screenBuffer.placeMessage(' ', xPos: 1, yPos: 1, cll: true);
   }
 }

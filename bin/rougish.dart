@@ -100,7 +100,7 @@ bool printScanline(TimelineTask trace) {
   TimelineTask printTask = TimelineTask(parent: trace);
   // draw buffer to screen
   printTask.start('printBuffer');
-  bool scanningComplete = scanlineBuffer.printNextScanline();
+  bool scanningComplete = scanlineBuffer.printNextScanline(state);
   printTask.finish();
   return scanningComplete;
 }
