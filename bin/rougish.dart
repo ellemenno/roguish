@@ -61,6 +61,9 @@ Screen popScreen() {
     Log.debug(logLabel,
         'popScreen() removed ${screen.runtimeType}; current screen is ${currentScreen.runtimeType}');
   }
+  else {
+    Log.warn(logLabel, 'popScreen() screenStack is now empty');
+  }
   return screen;
 }
 
@@ -322,6 +325,7 @@ void main(List<String> arguments) {
     addSignalListeners();
   }, (e, s) {
     Log.warn(logLabel, 'listener zone exception: ${e}');
+    Log.debug(logLabel, 'stacktrace:\n${s}');
   });
 
   scanlineBuffer.scanGap = state.scanGap;
