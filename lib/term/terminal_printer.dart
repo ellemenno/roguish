@@ -1,11 +1,9 @@
-
 import 'dart:io';
 
 import './ansi.dart' as ansi;
 
 /// Print strings to a given output stream (`stdout` or `stderr`).
 class TerminalPrinter {
-
   /// Instantiate a terminal printer that will write to a given output stream (`stdout` or `stderr`, both instances of `Stdout`).
   ///
   /// _note:_ shell scripting convention is to use `stderr` for messages that will be read by users,
@@ -43,9 +41,13 @@ class TerminalPrinter {
 
   /// Print provided string buffer [sb] to the output stream. Optionally clear the buffer after.
   void printBuffer(StringBuffer sb, {clearOnWrite = true}) {
-    if (sb.length == 0) { return; }
+    if (sb.length == 0) {
+      return;
+    }
     _fd.write(sb.toString());
-    if (clearOnWrite) { sb.clear(); }
+    if (clearOnWrite) {
+      sb.clear();
+    }
   }
 
   /// Add ANSI codes to the provided string buffer to clear the screen and move the cursor to 0,0 (top left corner).
@@ -112,5 +114,4 @@ class TerminalPrinter {
     int y = (_dim[1] / 2).floor() + yOffset;
     placeMessage(sb, msg, xPos: x, yPos: y, cll: cll);
   }
-
 }

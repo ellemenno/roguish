@@ -66,8 +66,7 @@ class DebugScreen extends Screen {
     _msgBuffer.write('   ');
     if (frameCost > frameBudget) {
       ansiLength += ansi.reverse(_msgBuffer, '${frameCost.round()}');
-    }
-    else {
+    } else {
       _msgBuffer.write('${frameCost.round()}');
     }
     _msgBuffer.write('/${frameBudget.round()} ');

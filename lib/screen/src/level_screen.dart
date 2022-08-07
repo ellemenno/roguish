@@ -32,8 +32,8 @@ class LevelScreen extends Screen {
   }
 
   void _drawMap(ScanlineBuffer screenBuffer, GameData state) {
-    screenBuffer.placeMessage('', yPos:1, cll:true);
-    map.LevelManager.render(screenBuffer, state.levelMap, yOffset:1);
+    screenBuffer.placeMessage('', yPos: 1, cll: true);
+    map.LevelManager.render(screenBuffer, state.levelMap, yOffset: 1);
   }
 
   void _drawUI(ScanlineBuffer screenBuffer, GameData state) {

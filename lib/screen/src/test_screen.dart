@@ -23,7 +23,8 @@ class TestScreen extends Screen {
     int y = 2;
     sb.placeMessage('font check for symbol coverage', xPos: 1, yPos: y);
 
-    y++; s = '';
+    y++;
+    s = '';
     sb.placeMessage('      ui: ', yPos: y++);
     for (var t in map.UIType.values) {
       s += map.uiSymbol(t);
@@ -35,7 +36,8 @@ class TestScreen extends Screen {
     }
     sb.placeMessage(s, yPos: y++);
 
-    y++; s = '';
+    y++;
+    s = '';
     sb.placeMessage('    cell: ', yPos: y++);
     for (var t in map.CellType.values) {
       s += map.cellSymbol(t);
@@ -47,7 +49,8 @@ class TestScreen extends Screen {
     }
     sb.placeMessage(s, yPos: y++);
 
-    y++; s = '';
+    y++;
+    s = '';
     sb.placeMessage('creature: ', yPos: y++);
     for (var t in map.CreatureType.values) {
       s += map.creatureSymbol(t);
@@ -59,7 +62,8 @@ class TestScreen extends Screen {
     }
     sb.placeMessage(s, yPos: y++);
 
-    y++; s = '';
+    y++;
+    s = '';
     sb.placeMessage('    item: ', yPos: y++);
     for (var t in map.ItemType.values) {
       s += map.itemSymbol(t);

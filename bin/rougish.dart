@@ -60,8 +60,7 @@ Screen popScreen() {
     screenListener = currentScreen.listen(onScreenEvent);
     Log.debug(logLabel,
         'popScreen() removed ${screen.runtimeType}; current screen is ${currentScreen.runtimeType}');
-  }
-  else {
+  } else {
     Log.warn(logLabel, 'popScreen() screenStack is now empty');
   }
   return screen;

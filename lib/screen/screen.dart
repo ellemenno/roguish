@@ -38,7 +38,6 @@ abstract class Screen {
     _sb.blankScreen();
   }
 
-
   final StreamController<ScreenEvent> _eventBroadcaster = StreamController<ScreenEvent>.broadcast();
 
   StreamSubscription<ScreenEvent> listen(void Function(ScreenEvent) eventHandler) {

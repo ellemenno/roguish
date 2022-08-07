@@ -80,7 +80,7 @@ class LevelManager {
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < cols; c++) {
         cell = map[r][c];
-        screenBuffer.placeMessage(cell.toString(), xPos: 1+c, yPos: 1+yOffset+r);
+        screenBuffer.placeMessage(cell.toString(), xPos: 1 + c, yPos: 1 + yOffset + r);
       }
     }
   }

@@ -20,8 +20,8 @@ class SetupScreen extends Screen {
   @override
   void draw(GameData state) {
     Screen.screenBuffer.centerMessage('setup screen', yOffset: -3);
-    Screen.screenBuffer.centerMessage('choose number of players: [${ansi.flip}1${ansi.flop}] [2]',
-        yOffset: 1);
+    Screen.screenBuffer
+        .centerMessage('choose number of players: [${ansi.flip}1${ansi.flop}] [2]', yOffset: 1);
     Screen.screenBuffer.centerMessage('<press Enter key to begin>', yOffset: 3);
   }
 }
