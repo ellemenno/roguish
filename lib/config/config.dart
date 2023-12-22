@@ -65,19 +65,23 @@ List<int> keyPause(Map<String, String> conf, {String defaultCodes = '0x60'}) {
   return toCodes(conf, 'key-pause', defaultCodes);
 }
 
-List<int> keyUp(Map<String, String> conf, {int player = 1, String defaultCodes = '0x1b,0x5b,0x41'}) {
+List<int> keyUp(Map<String, String> conf,
+    {int player = 1, String defaultCodes = '0x1b,0x5b,0x41'}) {
   return toCodes(conf, 'key-p${player}_up', defaultCodes);
 }
 
-List<int> keyDown(Map<String, String> conf, {int player = 1, String defaultCodes = '0x1b,0x5b,0x42'}) {
+List<int> keyDown(Map<String, String> conf,
+    {int player = 1, String defaultCodes = '0x1b,0x5b,0x42'}) {
   return toCodes(conf, 'key-p${player}_down', defaultCodes);
 }
 
-List<int> keyLeft(Map<String, String> conf, {int player = 1, String defaultCodes = '0x1b,0x5b,0x44'}) {
+List<int> keyLeft(Map<String, String> conf,
+    {int player = 1, String defaultCodes = '0x1b,0x5b,0x44'}) {
   return toCodes(conf, 'key-p${player}_left', defaultCodes);
 }
 
-List<int> keyRight(Map<String, String> conf, {int player = 1, String defaultCodes = '0x1b,0x5b,0x43'}) {
+List<int> keyRight(Map<String, String> conf,
+    {int player = 1, String defaultCodes = '0x1b,0x5b,0x43'}) {
   return toCodes(conf, 'key-p${player}_right', defaultCodes);
 }
 

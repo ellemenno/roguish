@@ -304,7 +304,8 @@ class LevelGenerator {
     return input;
   }
 
-  static List<Rectangle> _bombByTotal(List<Rectangle> input, math.Random prng, {num retention = 0.66}) {
+  static List<Rectangle> _bombByTotal(List<Rectangle> input, math.Random prng,
+      {num retention = 0.66}) {
     List<Rectangle> result = [];
     int n = (input.length * retention).round();
     for (int i = 0; i < n; i++) {
@@ -341,7 +342,8 @@ class LevelGenerator {
     return result;
   }
 
-  static List<Rectangle> _splitHorV(Rectangle r, math.Random prng, {int minDim = 3, int halfGap = 1}) {
+  static List<Rectangle> _splitHorV(Rectangle r, math.Random prng,
+      {int minDim = 3, int halfGap = 1}) {
     List<Rectangle> input = [r];
     List<Rectangle> result = [];
     Rectangle r1;
