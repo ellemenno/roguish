@@ -1,5 +1,5 @@
 # roguish
-a rougue-like
+a rogue-like
 
 
 ## building
