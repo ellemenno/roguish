@@ -28,8 +28,9 @@ $ grind build
 
 - logs are written to `log.txt` in the root of the project.
 - log level, runtime seed, and key codes can be set in `bin/rougish.conf`.
-- use the `~` key to toggle runtime stats.
-- use the `\`` key to open the command bar. See `lib/screen/src/command\_screen::\_parseCommand` for supported commands.
+- use the `~` (_tilde_) key to toggle runtime stats.
+- use the `` ` `` (_grave_) key to open the command bar.
+  - see `lib/screen/src/command_screen::_parseCommand()` for supported commands.
 
 
 
