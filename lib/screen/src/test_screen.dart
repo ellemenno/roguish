@@ -1,7 +1,7 @@
-import 'package:rougish/game/game_data.dart';
-import 'package:rougish/game/map.dart' as map;
-import 'package:rougish/term/scanline_buffer.dart';
-import 'package:rougish/term/terminal.dart' as term;
+import 'package:roguish/game/game_data.dart';
+import 'package:roguish/game/map.dart' as map;
+import 'package:roguish/term/scanline_buffer.dart';
+import 'package:roguish/term/terminal.dart' as term;
 import '../screen.dart';
 
 class TestScreen extends Screen {

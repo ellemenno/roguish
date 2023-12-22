@@ -1,6 +1,6 @@
 import 'package:test/test.dart';
 
-import 'package:rougish/term/ansi.dart' as ansi;
+import 'package:roguish/term/ansi.dart' as ansi;
 
 void testAnsi() {
   group('ansi', () {

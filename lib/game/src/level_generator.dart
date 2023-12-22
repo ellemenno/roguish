@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 
-import 'package:rougish/log/log.dart';
+import 'package:roguish/log/log.dart';
 
 import './cardinal.dart';
 import './cell.dart';

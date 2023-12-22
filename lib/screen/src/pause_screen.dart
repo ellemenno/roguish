@@ -1,9 +1,9 @@
-import 'package:rougish/config/config.dart' as config;
-import 'package:rougish/game/game_data.dart';
-import 'package:rougish/log/log.dart';
-import 'package:rougish/term/ansi.dart' as ansi;
-import 'package:rougish/term/scanline_buffer.dart';
-import 'package:rougish/term/terminal.dart' as term;
+import 'package:roguish/config/config.dart' as config;
+import 'package:roguish/game/game_data.dart';
+import 'package:roguish/log/log.dart';
+import 'package:roguish/term/ansi.dart' as ansi;
+import 'package:roguish/term/scanline_buffer.dart';
+import 'package:roguish/term/terminal.dart' as term;
 import '../screen.dart';
 
 class PauseScreen extends Screen {

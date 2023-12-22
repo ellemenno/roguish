@@ -1,7 +1,7 @@
 import 'package:test/test.dart';
 
-import 'package:rougish/term/typing_buffer.dart';
-import 'package:rougish/term/ansi.dart' as ansi;
+import 'package:roguish/term/typing_buffer.dart';
+import 'package:roguish/term/ansi.dart' as ansi;
 
 void testTyping() {
   group('typing_buffer', () {

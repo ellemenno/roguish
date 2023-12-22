@@ -1,5 +1,5 @@
-import 'package:rougish/log/log.dart';
-import 'package:rougish/term/terminal.dart' as term;
+import 'package:roguish/log/log.dart';
+import 'package:roguish/term/terminal.dart' as term;
 
 export 'src/from_file.dart' show fromFile;
 

@@ -1,6 +1,6 @@
 import 'package:test/test.dart';
 
-import 'package:rougish/term/terminal.dart' as term;
+import 'package:roguish/term/terminal.dart' as term;
 
 void testTerminal() {
   group('terminal', () {

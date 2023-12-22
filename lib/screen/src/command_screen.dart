@@ -1,8 +1,8 @@
-import 'package:rougish/config/config.dart' as config;
-import 'package:rougish/game/game_data.dart';
-import 'package:rougish/log/log.dart';
-import 'package:rougish/term/terminal.dart' as term;
-import 'package:rougish/term/typing_buffer.dart';
+import 'package:roguish/config/config.dart' as config;
+import 'package:roguish/game/game_data.dart';
+import 'package:roguish/log/log.dart';
+import 'package:roguish/term/terminal.dart' as term;
+import 'package:roguish/term/typing_buffer.dart';
 import '../screen.dart';
 
 class CommandScreen extends Screen {

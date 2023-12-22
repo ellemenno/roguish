@@ -1,4 +1,4 @@
-import 'package:rougish/term/scanline_buffer.dart';
+import 'package:roguish/term/scanline_buffer.dart';
 
 import './cell.dart';
 import './creature.dart';

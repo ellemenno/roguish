@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:grinder/grinder.dart';
 import 'package:path/path.dart' as path;
 
-const String name = 'rougish';
+const String name = 'roguish';
 final Directory docDir = Directory('doc');
 
 void main(List<String> args) => grind(args);

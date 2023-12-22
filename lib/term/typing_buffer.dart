@@ -1,5 +1,5 @@
 import 'dart:math' as math;
-import 'package:rougish/term/ansi.dart' as ansi;
+import 'package:roguish/term/ansi.dart' as ansi;
 
 /// Cursor-based typing API for collecting and modifying a sequence of characters.
 ///

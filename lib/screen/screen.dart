@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:rougish/game/game_data.dart';
-import 'package:rougish/term/scanline_buffer.dart';
+import 'package:roguish/game/game_data.dart';
+import 'package:roguish/term/scanline_buffer.dart';
 
 import 'src/command_screen.dart';
 import 'src/debug_screen.dart';

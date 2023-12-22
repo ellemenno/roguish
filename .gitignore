@@ -2,7 +2,7 @@
 .packages
 *.sublime-*
 bin/*
-!bin/rougish.dart
+!bin/roguish.dart
 doc
 log.txt
 TODO.md

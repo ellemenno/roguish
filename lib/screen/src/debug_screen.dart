@@ -1,6 +1,6 @@
-import 'package:rougish/game/game_data.dart';
-import 'package:rougish/term/ansi.dart' as ansi;
-import 'package:rougish/term/terminal.dart' as term;
+import 'package:roguish/game/game_data.dart';
+import 'package:roguish/term/ansi.dart' as ansi;
+import 'package:roguish/term/terminal.dart' as term;
 import '../screen.dart';
 
 class Sampler {

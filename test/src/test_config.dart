@@ -1,6 +1,6 @@
 import 'package:test/test.dart';
 
-import 'package:rougish/config/config.dart' as config;
+import 'package:roguish/config/config.dart' as config;
 
 void testConfig() {
   group('config', () {

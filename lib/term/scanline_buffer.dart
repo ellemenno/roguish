@@ -1,6 +1,6 @@
 import 'dart:math' as math;
-import 'package:rougish/game/game_data.dart';
-import 'package:rougish/log/log.dart';
+import 'package:roguish/game/game_data.dart';
+import 'package:roguish/log/log.dart';
 import './ansi.dart' as ansi;
 import './terminal_printer.dart';
 

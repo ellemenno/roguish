@@ -1,8 +1,8 @@
-import 'package:rougish/config/config.dart' as config;
-import 'package:rougish/game/game_data.dart';
-import 'package:rougish/game/map.dart' as map;
-import 'package:rougish/log/log.dart';
-import 'package:rougish/term/scanline_buffer.dart';
+import 'package:roguish/config/config.dart' as config;
+import 'package:roguish/game/game_data.dart';
+import 'package:roguish/game/map.dart' as map;
+import 'package:roguish/log/log.dart';
+import 'package:roguish/term/scanline_buffer.dart';
 import '../screen.dart';
 
 class LevelScreen extends Screen {
