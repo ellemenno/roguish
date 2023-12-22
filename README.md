@@ -1,6 +1,7 @@
 # rougish
 a rougue-like
 
+
 ## building
 > rougish uses the [grinder] task runner for dart (see `tool/grind.dart`)
 
@@ -21,6 +22,14 @@ to run all the tasks needed to prepare a release candidate:
 ```console
 $ grind build
 ```
+
+
+## debugging
+
+- logs are written to `log.txt` in the root of the project.
+- log level, runtime seed, and key codes can be set in `bin/rougish.conf`.
+- use the `~` key to toggle runtime stats.
+- use the `\`` key to open the command bar. See `lib/screen/src/command\_screen::\_parseCommand` for supported commands.
 
 
 
