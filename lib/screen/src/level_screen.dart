@@ -2,9 +2,7 @@ import 'package:rougish/config/config.dart' as config;
 import 'package:rougish/game/game_data.dart';
 import 'package:rougish/game/map.dart' as map;
 import 'package:rougish/log/log.dart';
-import 'package:rougish/term/ansi.dart' as ansi;
 import 'package:rougish/term/scanline_buffer.dart';
-import 'package:rougish/term/terminal.dart' as term;
 import '../screen.dart';
 
 class LevelScreen extends Screen {

@@ -15,11 +15,11 @@ class Sampler {
     }
   }
 
-  Sampler(numSamples) {
+  Sampler(int numSamples) {
     _history = List<int>.filled(numSamples, 0);
   }
 
-  addSample(int sample) {
+  void addSample(int sample) {
     _history[_index] = sample;
     _index = (_index + 1) % _history.length;
     int sum = 0, numSamples = 0;
@@ -60,7 +60,7 @@ class DebugScreen extends Screen {
     String keyCode = term.codeHash(state.keyCodes);
 
     int ansiLength = 0;
-    int formatLabel(lbl) => ansi.c16(_msgBuffer, lbl, fg: ansi.c16_black, fb: true);
+    int formatLabel(String lbl) => ansi.c16(_msgBuffer, lbl, fg: ansi.black, fb: true);
 
     _msgBuffer.clear();
     _msgBuffer.write('   ');

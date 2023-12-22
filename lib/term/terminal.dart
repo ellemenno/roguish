@@ -125,7 +125,7 @@ bool isEnter(List<int> seq) {
 }
 
 /// Create an iterable list of hex code strings from given key codes.
-Iterable<String> codesToString(List<int> codes, {prefix = '0x'}) =>
+Iterable<String> codesToString(List<int> codes, {String prefix = '0x'}) =>
     codes.map((e) => '${prefix}${e.toRadixString(16).padLeft(2, '0')}');
 
 /// Create a string hash of the keycode sequence.

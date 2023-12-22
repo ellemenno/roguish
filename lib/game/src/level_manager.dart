@@ -1,4 +1,3 @@
-import 'package:rougish/term/ansi.dart' as ansi;
 import 'package:rougish/term/scanline_buffer.dart';
 
 import './cell.dart';

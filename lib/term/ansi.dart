@@ -39,28 +39,28 @@ const leaveBuffer = '${csi}?1049l';
 const none = -1;
 
 /// Integer value for ANSI Black, for use in [c16]
-const c16_black = 0;
+const black = 0;
 
 /// Integer value for ANSI Red, for use in [c16]
-const c16_red = 1;
+const red = 1;
 
 /// Integer value for ANSI Green, for use in [c16]
-const c16_green = 2;
+const green = 2;
 
 /// Integer value for ANSI Yellow, for use in [c16]
-const c16_yellow = 3;
+const yellow = 3;
 
 /// Integer value for ANSI Blue, for use in [c16]
-const c16_blue = 4;
+const blue = 4;
 
 /// Integer value for ANSI Magenta, for use in [c16]
-const c16_magenta = 5;
+const magenta = 5;
 
 /// Integer value for ANSI Cyan, for use in [c16]
-const c16_cyan = 6;
+const cyan = 6;
 
 /// Integer value for ANSI White, for use in [c16]
-const c16_white = 7;
+const white = 7;
 
 /// Decorates [msg] with optional foreground and background colors, and prints it to [sb].
 ///
@@ -208,7 +208,7 @@ int cls(StringBuffer sb, {int n = 2}) {
 /// Returns the number of non-printing ascii characters written.
 ///
 /// This will unhide the cursor if it was previously hidden. To re-hide the cursor, provide [hideCursor] as `true`
-int clh(StringBuffer sb, {hideCursor = false}) {
+int clh(StringBuffer sb, {bool hideCursor = false}) {
   int oldLength = sb.length;
   sb.write(ris);
   if (hideCursor) {

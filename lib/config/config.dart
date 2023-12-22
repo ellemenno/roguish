@@ -36,7 +36,7 @@ List<int> toCodes(Map<String, String> conf, String key, String alt) {
   return codes;
 }
 
-LogLevel logLevel(Map<String, String> conf, {defaultLevel = LogLevel.none}) {
+LogLevel logLevel(Map<String, String> conf, {LogLevel defaultLevel = LogLevel.none}) {
   return toLogLevel(conf['log_level'] ?? defaultLevel.name);
 }
 
@@ -45,39 +45,39 @@ int prngSeed(Map<String, String> conf) {
       conf['prng_seed'] ?? '${DateTime.now().microsecond * DateTime.now().millisecond}');
 }
 
-List<int> keyCommandBar(Map<String, String> conf, {defaultCodes = '0x20'}) {
+List<int> keyCommandBar(Map<String, String> conf, {String defaultCodes = '0x20'}) {
   return toCodes(conf, 'key-command', defaultCodes);
 }
 
-List<int> keyDebugPanel(Map<String, String> conf, {defaultCodes = '0x7e'}) {
+List<int> keyDebugPanel(Map<String, String> conf, {String defaultCodes = '0x7e'}) {
   return toCodes(conf, 'key-debug', defaultCodes);
 }
 
-List<int> keyCursorLeft(Map<String, String> conf, {defaultCodes = '0x1b,0x5b,0x44'}) {
+List<int> keyCursorLeft(Map<String, String> conf, {String defaultCodes = '0x1b,0x5b,0x44'}) {
   return toCodes(conf, 'key-cursor_left', defaultCodes);
 }
 
-List<int> keyCursorRight(Map<String, String> conf, {defaultCodes = '0x1b,0x5b,0x43'}) {
+List<int> keyCursorRight(Map<String, String> conf, {String defaultCodes = '0x1b,0x5b,0x43'}) {
   return toCodes(conf, 'key-cursor_right', defaultCodes);
 }
 
-List<int> keyPause(Map<String, String> conf, {defaultCodes = '0x60'}) {
+List<int> keyPause(Map<String, String> conf, {String defaultCodes = '0x60'}) {
   return toCodes(conf, 'key-pause', defaultCodes);
 }
 
-List<int> keyUp(Map<String, String> conf, {player = 1, defaultCodes = '0x1b,0x5b,0x41'}) {
+List<int> keyUp(Map<String, String> conf, {int player = 1, String defaultCodes = '0x1b,0x5b,0x41'}) {
   return toCodes(conf, 'key-p${player}_up', defaultCodes);
 }
 
-List<int> keyDown(Map<String, String> conf, {player = 1, defaultCodes = '0x1b,0x5b,0x42'}) {
+List<int> keyDown(Map<String, String> conf, {int player = 1, String defaultCodes = '0x1b,0x5b,0x42'}) {
   return toCodes(conf, 'key-p${player}_down', defaultCodes);
 }
 
-List<int> keyLeft(Map<String, String> conf, {player = 1, defaultCodes = '0x1b,0x5b,0x44'}) {
+List<int> keyLeft(Map<String, String> conf, {int player = 1, String defaultCodes = '0x1b,0x5b,0x44'}) {
   return toCodes(conf, 'key-p${player}_left', defaultCodes);
 }
 
-List<int> keyRight(Map<String, String> conf, {player = 1, defaultCodes = '0x1b,0x5b,0x43'}) {
+List<int> keyRight(Map<String, String> conf, {int player = 1, String defaultCodes = '0x1b,0x5b,0x43'}) {
   return toCodes(conf, 'key-p${player}_right', defaultCodes);
 }
 
@@ -113,7 +113,7 @@ bool isPause(String hash) {
   return (hash == _keyPauseHash);
 }
 
-bool isUp(String hash, {player = 1}) {
+bool isUp(String hash, {int player = 1}) {
   switch (player) {
     case 1:
       return (hash == _keyP1UpHash);
@@ -121,7 +121,7 @@ bool isUp(String hash, {player = 1}) {
   return false;
 }
 
-bool isDown(String hash, {player = 1}) {
+bool isDown(String hash, {int player = 1}) {
   switch (player) {
     case 1:
       return (hash == _keyP1DownHash);
@@ -129,7 +129,7 @@ bool isDown(String hash, {player = 1}) {
   return false;
 }
 
-bool isLeft(String hash, {player = 1}) {
+bool isLeft(String hash, {int player = 1}) {
   switch (player) {
     case 1:
       return (hash == _keyP1LeftHash);
@@ -137,7 +137,7 @@ bool isLeft(String hash, {player = 1}) {
   return false;
 }
 
-bool isRight(String hash, {player = 1}) {
+bool isRight(String hash, {int player = 1}) {
   switch (player) {
     case 1:
       return (hash == _keyP1RightHash);

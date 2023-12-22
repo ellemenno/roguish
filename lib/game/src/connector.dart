@@ -1,12 +1,12 @@
 class Connector {
   static final Connector noConnector = Connector._empty();
 
-  static mergeConnections(Connector peer1, Connector peer2) {
+  static void mergeConnections(Connector peer1, Connector peer2) {
     peer1.shareConnectionsWith(peer2);
     peer2.shareConnectionsWith(peer1);
   }
 
-  static twoWayConnection(Connector peer1, Connector peer2) {
+  static void twoWayConnection(Connector peer1, Connector peer2) {
     peer1.connectTo(peer2);
     peer2.connectTo(peer1);
   }

@@ -102,7 +102,7 @@ class LevelGenerator {
     }
   }
 
-  static void _paintRoom(List<List<Cell>> map, Rectangle coords, {erasing = false}) {
+  static void _paintRoom(List<List<Cell>> map, Rectangle coords, {bool erasing = false}) {
     int c1 = coords.left;
     int c2 = coords.right - 1;
     int r1 = coords.top;
@@ -304,7 +304,7 @@ class LevelGenerator {
     return input;
   }
 
-  static List<Rectangle> _bombByTotal(List<Rectangle> input, math.Random prng, {retention = 0.66}) {
+  static List<Rectangle> _bombByTotal(List<Rectangle> input, math.Random prng, {num retention = 0.66}) {
     List<Rectangle> result = [];
     int n = (input.length * retention).round();
     for (int i = 0; i < n; i++) {
@@ -314,7 +314,7 @@ class LevelGenerator {
   }
 
   static List<Rectangle> _splitFurther(List<Rectangle> input,
-      {maxRatio = 2.5, minDim = 4, halfGap = 2}) {
+      {num maxRatio = 2.5, int minDim = 4, int halfGap = 2}) {
     List<Rectangle> result = [];
     Rectangle r1;
     Rectangle r2;
@@ -341,7 +341,7 @@ class LevelGenerator {
     return result;
   }
 
-  static List<Rectangle> _splitHorV(Rectangle r, math.Random prng, {minDim = 3, halfGap = 1}) {
+  static List<Rectangle> _splitHorV(Rectangle r, math.Random prng, {int minDim = 3, int halfGap = 1}) {
     List<Rectangle> input = [r];
     List<Rectangle> result = [];
     Rectangle r1;
@@ -379,7 +379,7 @@ class LevelGenerator {
     map.clear();
   }
 
-  static List<Rectangle> makeSpaces(int cols, int rows, math.Random prng, {density = 0.50}) {
+  static List<Rectangle> makeSpaces(int cols, int rows, math.Random prng, {num density = 0.50}) {
     Rectangle bounds = Rectangle.byDimension(cols, rows);
     List<Rectangle> spaces;
     // super dense:

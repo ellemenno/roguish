@@ -40,7 +40,7 @@ class TerminalPrinter {
   void print(String msg) => _fd.write(msg);
 
   /// Print provided string buffer [sb] to the output stream. Optionally clear the buffer after.
-  void printBuffer(StringBuffer sb, {clearOnWrite = true}) {
+  void printBuffer(StringBuffer sb, {bool clearOnWrite = true}) {
     if (sb.length == 0) {
       return;
     }
@@ -55,7 +55,7 @@ class TerminalPrinter {
   /// The provided stringbuffer is cleared and filled with ANSI codes to reset styles,
   /// clear the screen, and position the cursor in the top left corner.
   /// Optionally, scrollback history can be cleared, and the cursor can be hidden.
-  void clear(StringBuffer sb, {hideCursor = false, clearHistory = false}) {
+  void clear(StringBuffer sb, {bool hideCursor = false, bool clearHistory = false}) {
     sb.clear();
     ansi.reset(sb);
     ansi.xy(sb, 1, 1);

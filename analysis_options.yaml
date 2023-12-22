@@ -8,3 +8,11 @@ include: package:lints/recommended.yaml
 analyzer:
   errors:
     unnecessary_brace_in_string_interps: ignore # prefer consistency instead
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+
+linter:
+  rules:
+    unnecessary_getters_setters: false

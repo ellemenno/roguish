@@ -6,7 +6,7 @@ import './terminal_printer.dart';
 
 class ScanlineBuffer {
   static const _logLabel = 'ScanlineBuffer';
-  static const _invalid_hash = -1;
+  static const _invalidHash = -1;
   static final _dim = List<int>.filled(2, 0);
   static final StringBuffer _buffer = StringBuffer();
   final TerminalPrinter _printer;
@@ -18,7 +18,7 @@ class ScanlineBuffer {
   ScanlineBuffer(this._printer) {
     _printer.size(_dim, useCache: false);
     _lines = List.generate(_dim[1], (_) => StringBuffer(), growable: false);
-    _hashes = List.generate(_dim[1], (_) => _invalid_hash, growable: false);
+    _hashes = List.generate(_dim[1], (_) => _invalidHash, growable: false);
   }
 
   int get centerline => _dim[1] ~/ 2;
@@ -101,7 +101,7 @@ class ScanlineBuffer {
   void dirtyLines({int lineA = 1, int lineB = -1, bool invalidateOnly = false}) {
     int firstIndex = math.max(0, lineA - 1);
     int lastIndex = lineB > -1 ? math.min(lineB, _hashes.length) : _hashes.length;
-    _hashes.fillRange(firstIndex, lastIndex, _invalid_hash);
+    _hashes.fillRange(firstIndex, lastIndex, _invalidHash);
     if (!invalidateOnly) {
       // also replace the dirty lines in the buffer with a clear line
       for (int i = firstIndex; i < lastIndex; i++) {

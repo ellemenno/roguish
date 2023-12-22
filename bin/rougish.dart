@@ -32,7 +32,6 @@ late Screen currentScreen;
 late StreamSubscription<ScreenEvent> screenListener;
 int _logCountdown = 0;
 int _logFrames = 30;
-int _scanLine = 0;
 bool paused = false;
 bool commandBarOpen = false;
 bool debugPanelOpen = false;

@@ -103,7 +103,7 @@ class TypingBuffer {
   ///
   /// By default, the cursor will be illustrated via ANSI codes for 'inverted' text.
   /// Set [withFormatting] `false` to keep ANSI codes out of the string buffer.
-  void toStringBuffer(StringBuffer sb, {withFormatting = true}) {
+  void toStringBuffer(StringBuffer sb, {bool withFormatting = true}) {
     sb.clear();
     int n = _chars.length;
     int i = 0;
